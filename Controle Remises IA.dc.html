@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  body { margin:0; background:#EEF1F5; font-family:'IBM Plex Sans',system-ui,sans-serif; color:#16222E; -webkit-font-smoothing:antialiased; }
+  a { color:#1E5C8F; text-decoration:none; }
+  a:hover { color:#0B2239; text-decoration:underline; }
+  * { box-sizing:border-box; }
+  @keyframes scanline { 0%{transform:translateY(0)} 100%{transform:translateY(320px)} }
+  @keyframes pulse { 0%,100%{opacity:.35} 50%{opacity:1} }
+  @keyframes spin { to { transform:rotate(360deg) } }
+  @keyframes fillbar { from { width:0 } to { width:100% } }
+</style>
+</helmet>
+
+<sc-if value="{{ isLogin }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex; min-height:100vh; min-width:1280px">
+  <div style="width:44%; background:#0B2239; color:#C9D6E4; padding:48px 56px; display:flex; flex-direction:column">
+    <div style="display:flex; align-items:center; gap:12px">
+      <div style="width:34px; height:34px; border-radius:6px; background:#1E5C8F; color:#fff; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700">SA</div>
+      <div style="display:flex; flex-direction:column; gap:1px">
+        <span style="font-size:15px; font-weight:700; color:#fff">Contrôle des instruments de paiement</span>
+        <span style="font-size:10.5px; letter-spacing:.9px; text-transform:uppercase; color:#7C93AB">Service achats · Factoring Tunis</span>
+      </div>
+    </div>
+    <div style="margin-top:auto; display:flex; flex-direction:column; gap:18px; max-width:420px">
+      <span style="font-size:26px; line-height:1.3; color:#fff; font-weight:600; letter-spacing:-.3px">Le contrôle des traites en 24 heures, sans céder sur la vigilance.</span>
+      <span style="font-size:13px; line-height:1.65; color:#9FB3C8">L'agent extrait les champs du recto, rapproche le référentiel IMX et contrôle les mentions obligatoires. Signatures, cachets et endossement restent statués par le caissier.</span>
+    </div>
+    <div style="margin-top:auto; display:flex; gap:28px; padding-top:36px; border-top:1px solid #1B3550">
+      <div style="display:flex; flex-direction:column; gap:2px">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:19px; font-weight:600; color:#fff">27 000</span>
+        <span style="font-size:11px; color:#7C93AB">IP traités en 2025</span>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:2px">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:19px; font-weight:600; color:#fff">24 h</span>
+        <span style="font-size:11px; color:#7C93AB">délai cible par remise</span>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:2px">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:19px; font-weight:600; color:#fff">4</span>
+        <span style="font-size:11px; color:#7C93AB">zones sous contrôle humain</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="flex:1; background:#EEF1F5; display:flex; align-items:center; justify-content:center; padding:40px">
+    <div style="width:392px; background:#fff; border:1px solid #D7DEE7; border-radius:8px; padding:28px 28px 24px; display:flex; flex-direction:column; gap:16px">
+      <div style="display:flex; flex-direction:column; gap:4px">
+        <span style="font-size:17px; font-weight:600; letter-spacing:-.1px">Connexion</span>
+        <span style="font-size:12px; color:#6B7E90">Authentification par annuaire interne TLF</span>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:6px">
+        <span style="font-size:11px; text-transform:uppercase; letter-spacing:.7px; color:#6B7E90">Identifiant</span>
+        <input type="text" value="{{ loginUser }}" onChange="{{ setUser }}" placeholder="h.mansouri" style="border:1px solid #DCE3EA; border-radius:5px; padding:9px 11px; font-family:'IBM Plex Mono',monospace; font-size:12.5px; color:#16222E; outline:none" style-focus="border-color:#1E5C8F" />
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:6px">
+        <span style="font-size:11px; text-transform:uppercase; letter-spacing:.7px; color:#6B7E90">Mot de passe</span>
+        <input type="password" value="{{ loginPwd }}" onChange="{{ setPwd }}" placeholder="••••••••" style="border:1px solid #DCE3EA; border-radius:5px; padding:9px 11px; font-family:'IBM Plex Mono',monospace; font-size:12.5px; color:#16222E; outline:none" style-focus="border-color:#1E5C8F" />
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:6px">
+        <span style="font-size:11px; text-transform:uppercase; letter-spacing:.7px; color:#6B7E90">Profil</span>
+        <div style="display:flex; gap:6px">
+          <sc-for list="{{ roles }}" as="r" hint-placeholder-count="2">
+            <div onClick="{{ r.pick }}" style="{{ r.style }}">{{ r.label }}</div>
+          </sc-for>
+        </div>
+      </div>
+
+      <button onClick="{{ submitLogin }}" style="background:#0B2239; color:#fff; border:none; border-radius:5px; padding:11px 14px; font-size:12.5px; font-weight:600; font-family:inherit; cursor:pointer; margin-top:2px" style-hover="background:#14395C">Se connecter</button>
+
+      <div style="display:flex; align-items:center; gap:8px; padding-top:12px; border-top:1px solid #EDF1F5">
+        <span style="font-size:11px; color:#6B7E90; line-height:1.5">Accès réservé aux collaborateurs habilités du service achats. Toute action est horodatée et tracée.</span>
+      </div>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isApp }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex; min-height:100vh; min-width:1280px; align-items:stretch">
+
+  <!-- SIDEBAR -->
+
+
+  <!-- MAIN -->
+  <main style="flex:1; min-width:0; display:flex; flex-direction:column">
+
+    <!-- TOPBAR -->
+    <header style="background:#FFFFFF; border-bottom:1px solid #D7DEE7; padding:12px 26px; display:flex; align-items:center; gap:22px; position:sticky; top:0; z-index:20">
+      <div style="display:flex; align-items:center; gap:12px">
+        <div style="width:30px; height:30px; border-radius:5px; background:#0B2239; color:#fff; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700">SA</div>
+        <div style="display:flex; flex-direction:column; gap:1px">
+          <span style="font-size:14px; font-weight:700; letter-spacing:-.1px">Contrôle des instruments de paiement</span>
+          <span style="font-size:10.5px; letter-spacing:.9px; text-transform:uppercase; color:#6B7E90">Service achats · Factoring Tunis</span>
+        </div>
+      </div>
+      <div style="width:1px; height:30px; background:#E1E7ED"></div>
+      <div style="font-size:13px; font-weight:600; color:#2A3B4C">{{ pageTitle }}</div>
+      <div style="margin-left:auto; display:flex; align-items:center; gap:14px">
+        <div style="display:flex; flex-direction:column; gap:5px; width:214px">
+          <div style="display:flex; justify-content:space-between; font-size:10.5px; color:#6B7E90">
+            <span style="letter-spacing:.4px; text-transform:uppercase">Délai de traitement</span>
+            <span style="font-family:'IBM Plex Mono',monospace; color:#B3600A; font-weight:600">14h 20m / 24h</span>
+          </div>
+          <div style="height:6px; border-radius:3px; background:#E4E9EF; overflow:hidden"><div style="width:59.7%; height:100%; background:#B3600A"></div></div>
+        </div>
+        <div style="display:flex; align-items:center; gap:7px; background:#F3F6F9; border:1px solid #DCE3EA; border-radius:5px; padding:6px 10px">
+          <span style="width:7px; height:7px; border-radius:50%; background:#1E7A4B; animation:pulse 1.8s infinite"></span>
+          <span style="font-size:11.5px; color:#3C4E5F; font-weight:500">Agent IA actif</span>
+        </div>
+        <div style="width:1px; height:30px; background:#E1E7ED"></div>
+        <div style="display:flex; align-items:center; gap:9px">
+          <div style="width:29px; height:29px; border-radius:50%; background:#1E5C8F; color:#fff; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:600">HM</div>
+          <div style="display:flex; flex-direction:column; line-height:1.3">
+            <span style="font-size:12px; font-weight:500">{{ userLabel }}</span>
+            <span style="font-size:10.5px; color:#6B7E90">{{ roleLabel }}</span>
+          </div>
+          <div onClick="{{ logout }}" title="Se déconnecter" style="font-size:11px; color:#6B7E90; border:1px solid #DCE3EA; border-radius:4px; padding:5px 9px; cursor:pointer" style-hover="background:#F5F7FA; color:#3C4E5F">Déconnexion</div>
+        </div>
+      </div>
+    </header>
+
+    <sc-if value="{{ isList }}" hint-placeholder-val="{{ true }}">
+    <div style="padding:22px 26px 40px; display:flex; flex-direction:column; gap:16px">
+
+      <div style="background:#fff; border:1px solid #D7DEE7; border-radius:6px; overflow:hidden">
+        <div style="padding:11px 14px; border-bottom:1px solid #E4E9EF; display:flex; align-items:center; gap:9px">
+          <span style="font-size:12.5px; font-weight:600">Nouvelle analyse — importer le scan d'une traite</span>
+          <span style="font-size:11px; color:#6B7E90">Recto et verso obligatoires — les deux faces sont requises pour lancer l'analyse</span>
+          <span style="margin-left:auto; font-size:10.5px; color:#6B7E90; font-family:'IBM Plex Mono',monospace">JPEG, PNG ou PDF · 300 dpi min.</span>
+        </div>
+        <div style="padding:14px; display:flex; gap:14px; align-items:stretch">
+          <div onClick="{{ pickRecto }}" onDragOver="{{ overRecto }}" onDragLeave="{{ leaveRecto }}" onDrop="{{ dropRecto }}" style="{{ rectoZoneStyle }}">
+            <input type="file" accept="image/*,.pdf" ref="{{ rectoInput }}" onChange="{{ changeRecto }}" style="display:none" />
+            <div style="{{ rectoEmptyStyle }}">
+              <span style="font-size:18px; color:#8B9AA8">⇱</span>
+              <span style="font-size:12.5px; font-weight:600; color:#2A3B4C">Recto de la traite</span>
+              <span style="font-size:11px; color:#6B7E90">Glisser le fichier ici ou cliquer pour parcourir</span>
+            </div>
+            <span style="{{ rectoNameStyle }}">{{ rectoName }}</span>
+          </div>
+          <div onClick="{{ pickVerso }}" onDragOver="{{ overVerso }}" onDragLeave="{{ leaveVerso }}" onDrop="{{ dropVerso }}" style="{{ versoZoneStyle }}">
+            <input type="file" accept="image/*,.pdf" ref="{{ versoInput }}" onChange="{{ changeVerso }}" style="display:none" />
+            <div style="{{ versoEmptyStyle }}">
+              <span style="font-size:18px; color:#8B9AA8">⇱</span>
+              <span style="font-size:12.5px; font-weight:600; color:#2A3B4C">Verso de la traite</span>
+              <span style="font-size:11px; color:#6B7E90">Zone d'endossement à l'ordre de SPG</span>
+            </div>
+            <span style="{{ versoNameStyle }}">{{ versoName }}</span>
+          </div>
+          <div style="width:250px; flex:0 0 250px; display:flex; flex-direction:column; gap:9px; justify-content:center">
+            <span style="font-size:11.5px; color:#6B7E90; line-height:1.5">{{ uploadNote }}</span>
+            <button onClick="{{ startUpload }}" style="{{ startStyle }}" style-hover="filter:brightness(.94)">Lancer l'analyse OCR / NLP</button>
+            <div onClick="{{ resetUpload }}" style="{{ resetStyle }}">Retirer les fichiers</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:12px">
+        <sc-for list="{{ compteurs }}" as="c" hint-placeholder-count="5">
+          <div onClick="{{ c.pick }}" style="{{ c.cardStyle }}">
+            <div style="font-size:10.5px; text-transform:uppercase; letter-spacing:.7px; color:#6B7E90">{{ c.label }}</div>
+            <div style="{{ c.numStyle }}">{{ c.n }}</div>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="background:#fff; border:1px solid #D7DEE7; border-radius:6px; overflow:hidden">
+        <div style="padding:12px 16px; border-bottom:1px solid #E4E9EF; display:flex; align-items:center; gap:10px">
+          <span style="font-size:13.5px; font-weight:600">Traites à contrôler</span>
+          <span style="font-size:11.5px; color:#6B7E90">— tri par délai restant croissant</span>
+          <div style="margin-left:auto; display:flex; gap:6px; align-items:center">
+            <span style="font-size:11px; color:#6B7E90; margin-right:2px">Statut :</span>
+            <sc-for list="{{ filters }}" as="f" hint-placeholder-count="6">
+              <div onClick="{{ f.pick }}" style="{{ f.style }}">{{ f.label }}</div>
+            </sc-for>
+          </div>
+        </div>
+
+        <table style="width:100%; border-collapse:collapse; font-size:12.5px">
+          <thead>
+            <tr style="background:#F5F7FA; color:#546678">
+              <th style="text-align:left; padding:9px 16px; font-size:10.5px; letter-spacing:.7px; text-transform:uppercase; font-weight:600; border-bottom:1px solid #E4E9EF">N° L-CN</th>
+              <th style="text-align:left; padding:9px 12px; font-size:10.5px; letter-spacing:.7px; text-transform:uppercase; font-weight:600; border-bottom:1px solid #E4E9EF">Tireur (adhérent)</th>
+              <th style="text-align:left; padding:9px 12px; font-size:10.5px; letter-spacing:.7px; text-transform:uppercase; font-weight:600; border-bottom:1px solid #E4E9EF">Tiré (débiteur)</th>
+              <th style="text-align:right; padding:9px 12px; font-size:10.5px; letter-spacing:.7px; text-transform:uppercase; font-weight:600; border-bottom:1px solid #E4E9EF">Montant</th>
+              <th style="text-align:left; padding:9px 12px; font-size:10.5px; letter-spacing:.7px; text-transform:uppercase; font-weight:600; border-bottom:1px solid #E4E9EF">Échéance</th>
+              <th style="text-align:left; padding:9px 12px; font-size:10.5px; letter-spacing:.7px; text-transform:uppercase; font-weight:600; border-bottom:1px solid #E4E9EF">Reçue le</th>
+              <th style="text-align:left; padding:9px 12px; font-size:10.5px; letter-spacing:.7px; text-transform:uppercase; font-weight:600; border-bottom:1px solid #E4E9EF">Statut</th>
+              <th style="text-align:left; padding:9px 12px; width:148px; font-size:10.5px; letter-spacing:.7px; text-transform:uppercase; font-weight:600; border-bottom:1px solid #E4E9EF">Délai (SLA 24h)</th>
+              <th style="border-bottom:1px solid #E4E9EF"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <sc-for list="{{ traites }}" as="t" hint-placeholder-count="8">
+              <tr onClick="{{ t.open }}" style="{{ t.rowStyle }}">
+                <td style="padding:11px 16px; border-bottom:1px solid #EDF1F5; font-family:'IBM Plex Mono',monospace; font-weight:500">{{ t.ref }}</td>
+                <td style="padding:11px 12px; border-bottom:1px solid #EDF1F5; font-weight:600">{{ t.tireur }}</td>
+                <td style="padding:11px 12px; border-bottom:1px solid #EDF1F5; color:#3C4E5F">{{ t.tire }}</td>
+                <td style="padding:11px 12px; border-bottom:1px solid #EDF1F5; text-align:right; font-family:'IBM Plex Mono',monospace">{{ t.montant }}</td>
+                <td style="padding:11px 12px; border-bottom:1px solid #EDF1F5; font-family:'IBM Plex Mono',monospace; color:#3C4E5F">{{ t.echeance }}</td>
+                <td style="padding:11px 12px; border-bottom:1px solid #EDF1F5; font-family:'IBM Plex Mono',monospace; color:#3C4E5F">{{ t.reception }}</td>
+                <td style="padding:11px 12px; border-bottom:1px solid #EDF1F5"><span style="{{ t.badgeStyle }}">{{ t.statut }}</span></td>
+                <td style="padding:11px 12px; border-bottom:1px solid #EDF1F5">
+                  <div style="display:flex; flex-direction:column; gap:4px">
+                    <span style="{{ t.slaTextStyle }}">{{ t.sla }}</span>
+                    <div style="height:5px; border-radius:3px; background:#E4E9EF; overflow:hidden"><div style="{{ t.slaBarStyle }}"></div></div>
+                  </div>
+                </td>
+                <td style="padding:11px 16px 11px 4px; border-bottom:1px solid #EDF1F5; text-align:right; color:#9AA9B7">›</td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+        <div style="padding:10px 16px; border-top:1px solid #E4E9EF; background:#F7F9FB; display:flex; align-items:center; gap:8px">
+          <span style="font-size:11.5px; color:#6B7E90">{{ pageInfo }}</span>
+          <div style="margin-left:auto; display:flex; align-items:center; gap:6px">
+            <div onClick="{{ pagePrev }}" style="{{ prevStyle }}">‹ Précédent</div>
+            <sc-for list="{{ pages }}" as="p" hint-placeholder-count="3">
+              <div onClick="{{ p.go }}" style="{{ p.style }}">{{ p.num }}</div>
+            </sc-for>
+            <div onClick="{{ pageNext }}" style="{{ nextStyle }}">Suivant ›</div>
+          </div>
+        </div>
+      </div>
+      <div style="font-size:11.5px; color:#6B7E90">Cliquez sur la traite <b>L-CN 011570763437 · ADACTIM</b> pour lancer l'analyse OCR / NLP.</div>
+    </div>
+    </sc-if>
+
+
+    <sc-if value="{{ isAnalyse }}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex; flex-direction:column">
+
+      <div style="background:#fff; border-bottom:1px solid #D7DEE7; padding:10px 26px; display:flex; align-items:center; gap:18px">
+        <div onClick="{{ goList }}" style="display:flex; align-items:center; gap:6px; font-size:12px; color:#1E5C8F; cursor:pointer; font-weight:500">← Liste des traites</div>
+        <div style="width:1px; height:30px; background:#E4E9EF"></div>
+        <div style="display:flex; flex-direction:column; gap:2px">
+          <span style="font-size:10.5px; text-transform:uppercase; letter-spacing:.7px; color:#6B7E90">N° L-CN</span>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:13px; font-weight:600">011570763437</span>
+        </div>
+        <div style="width:1px; height:30px; background:#E4E9EF"></div>
+        <div style="display:flex; flex-direction:column; gap:2px">
+          <span style="font-size:10.5px; text-transform:uppercase; letter-spacing:.7px; color:#6B7E90">Tireur</span>
+          <span style="font-size:13px; font-weight:600">ADACTIM</span>
+        </div>
+        <div style="width:1px; height:30px; background:#E4E9EF"></div>
+        <div style="display:flex; flex-direction:column; gap:2px">
+          <span style="font-size:10.5px; text-transform:uppercase; letter-spacing:.7px; color:#6B7E90">Tiré</span>
+          <span style="font-size:13px; font-weight:600">LA MÉDITERRANÉENNE</span>
+        </div>
+        <div style="width:1px; height:30px; background:#E4E9EF"></div>
+        <div style="display:flex; flex-direction:column; gap:2px">
+          <span style="font-size:10.5px; text-transform:uppercase; letter-spacing:.7px; color:#6B7E90">Montant · échéance</span>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:13px; font-weight:600">8 117,504 DT · 28/08/2026</span>
+        </div>
+        <div style="margin-left:auto; display:flex; align-items:center; gap:10px">
+          <span style="{{ statutBadgeStyle }}">{{ statutTraite }}</span>
+        </div>
+      </div>
+
+
+      <sc-if value="{{ isAnalyse }}" hint-placeholder-val="{{ true }}">
+      <div style="padding:18px 26px 44px; display:grid; grid-template-columns:minmax(560px,1fr) minmax(520px,1fr); gap:16px">
+
+        <!-- colonne gauche : le document -->
+        <div>
+          <div style="display:flex; flex-direction:column; gap:14px; position:sticky; top:76px">
+          <div style="background:#fff; border:1px solid #D7DEE7; border-radius:6px; overflow:hidden">
+            <div style="padding:10px 14px; border-bottom:1px solid #E4E9EF; display:flex; align-items:center; gap:8px">
+              <span style="font-size:12.5px; font-weight:600">{{ faceTitre }}</span>
+              <span style="font-size:11px; color:#6B7E90; font-family:'IBM Plex Mono',monospace">{{ scanLabel }}</span>
+              <span style="{{ versoNoteStyle }}">aucune donnée OCR extractible</span>
+              <div style="margin-left:auto; display:flex; gap:6px">
+                <span onClick="{{ showRecto }}" style="{{ tabRectoStyle }}">Recto</span>
+                <span onClick="{{ showVerso }}" style="{{ tabVersoStyle }}">Verso · endossement</span>
+              </div>
+            </div>
+
+            <div style="position:relative; padding:16px; background:#E9EDF2">
+              <sc-if value="{{ isRecto }}" hint-placeholder-val="{{ true }}">
+              <!-- fac-similé traite — reproduction du formulaire officiel tunisien -->
+              <div style="position:relative; background:#FCFAF4; border:1px solid #B9B199; border-radius:2px; overflow:hidden; font-size:10px; color:#3A3324">
+
+                <!-- bandeau imprimé -->
+                <div style="height:34px; background:repeating-linear-gradient(115deg,#E9C9C2 0 3px,#F6E4E0 3px 7px); border-bottom:1px solid #C9BFA8; display:flex; align-items:center; padding:0 12px; gap:14px">
+                  <span style="font-size:7.5px; line-height:1.15; color:#B0463A; font-weight:600">République<br />Tunisienne</span>
+                  <span style="font-size:17px; font-weight:700; color:#B0463A; font-family:Georgia,serif; font-style:italic; letter-spacing:.4px">Lettre de Change</span>
+                  <span style="font-size:7.5px; line-height:1.15; color:#B0463A; font-weight:600">Republic<br />Of Tunisia</span>
+                  <span style="font-size:15px; font-weight:700; color:#B0463A; font-family:Georgia,serif; font-style:italic">Bill of exchange</span>
+                  <span style="margin-left:auto; font-size:11px; color:#B0463A; font-weight:700">كمبيالة</span>
+                </div>
+
+                <!-- rangée 1 -->
+                <div style="display:flex; border-bottom:1px solid #C9BFA8; height:94px">
+                  <div style="position:relative; width:25%; border-right:1px solid #C9BFA8; padding:4px 6px; outline:1.5px dashed #7A4FB3; outline-offset:-2px; background:rgba(122,79,179,.05)">
+                    <div style="display:flex; justify-content:space-between"><span style="font-size:7.5px; color:#6E6449">Signature du tiré</span><span style="font-size:8px; color:#6E6449">إمضاء المسحوب عليه</span></div>
+                    <div style="position:absolute; left:14px; top:22px; width:60px; height:60px; border:1.4px solid rgba(45,70,145,.5); border-radius:50%; transform:rotate(-9deg); display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; color:rgba(45,70,145,.62); line-height:1.15">
+                      <span style="font-size:7.5px; font-weight:700; letter-spacing:.3px">ADACTIM</span>
+                      <span style="font-size:4.5px">MF 1330392/A/A/M/000</span>
+                    </div>
+                    <svg viewBox="0 0 120 60" style="position:absolute; left:34px; top:24px; width:96px; height:56px; opacity:.62"><path d="M6 44 C24 8, 40 52, 58 20 C72 -2, 82 46, 100 26" fill="none" stroke="#1D3A6B" stroke-width="2.2" stroke-linecap="round"></path></svg>
+                    <span style="position:absolute; right:-1px; top:-1px; background:#7A4FB3; color:#fff; font-size:7.5px; padding:1px 5px; letter-spacing:.4px">HUMAIN</span>
+                  </div>
+
+                  <div style="width:37%; border-right:1px solid #C9BFA8; display:flex; flex-direction:column">
+                    <div style="position:relative; display:flex; border-bottom:1px solid #C9BFA8; height:46px; outline:1.5px solid #1E5C8F; outline-offset:-2px; background:rgba(30,92,143,.06)">
+                      <div style="flex:1; padding:4px 6px; border-right:1px dotted #CFC5AE">
+                        <div style="display:flex; justify-content:space-between"><span style="font-size:7.5px; color:#6E6449">Echéance</span><span style="font-size:8px; color:#6E6449">حلول الأجل</span></div>
+                        <div style="font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:600; color:#1D3A6B; margin-top:3px">28/08/2026</div>
+                      </div>
+                      <div style="width:44%; padding:4px 6px; display:flex; flex-direction:column; gap:1px">
+                        <div style="display:flex; gap:5px; align-items:baseline"><span style="font-size:7.5px; color:#6E6449">A</span><span style="font-size:10.5px; color:#1D3A6B; font-weight:600">Tunis</span></div>
+                        <div style="display:flex; gap:5px; align-items:baseline"><span style="font-size:7.5px; color:#6E6449">Le</span><span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:#1D3A6B; font-weight:600">05/08/2026</span></div>
+                      </div>
+                      <span style="position:absolute; left:-1px; top:-1px; background:#1E5C8F; color:#fff; font-size:7.5px; padding:1px 5px; letter-spacing:.4px">OCR · occ. 1</span>
+                    </div>
+                    <div style="position:relative; flex:1; padding:4px 6px; outline:1.5px solid #1E5C8F; outline-offset:-2px; background:rgba(30,92,143,.06)">
+                      <div style="display:flex; justify-content:space-between"><span style="font-size:7.5px; color:#6E6449">RIB ou RIP du Tiré</span><span style="font-size:7.5px; color:#6E6449">المعرف البنكي للمسحوب عليه</span></div>
+                      <div style="font-family:'IBM Plex Mono',monospace; font-size:12.5px; font-weight:600; color:#1D3A6B; letter-spacing:.8px; margin-top:4px">11 003 0002917001788 36</div>
+                      <span style="position:absolute; left:-1px; bottom:-1px; background:#1E5C8F; color:#fff; font-size:7.5px; padding:1px 5px; letter-spacing:.4px">OCR · occ. 1</span>
+                    </div>
+                  </div>
+
+                  <div style="flex:1; display:flex; flex-direction:column">
+                    <div style="border-bottom:1px solid #C9BFA8; padding:4px 8px; height:46px">
+                      <div style="display:flex; justify-content:space-between"><span style="font-size:7.5px; color:#6E6449">Ordre de paiement L - C N°</span><span style="font-size:8px; color:#6E6449">أمر بدفع الكمبيالة عدد</span></div>
+                      <div style="font-family:'IBM Plex Mono',monospace; font-size:12.5px; font-weight:600; letter-spacing:.9px; margin-top:3px">011570763437</div>
+                    </div>
+                    <div style="position:relative; flex:1; padding:4px 8px; outline:1.5px solid #1E5C8F; outline-offset:-2px; background:rgba(30,92,143,.06)">
+                      <div style="display:flex; justify-content:space-between"><span style="font-size:7.5px; color:#6E6449">Montant</span><span style="font-size:8px; color:#6E6449">المبلغ</span></div>
+                      <div style="font-family:'IBM Plex Mono',monospace; font-size:13px; font-weight:600; color:#1D3A6B; margin-top:3px">＃ 8117,504 ＃</div>
+                      <span style="position:absolute; right:-1px; bottom:-1px; background:#1E5C8F; color:#fff; font-size:7.5px; padding:1px 5px; letter-spacing:.4px">OCR · occ. 1</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- rangée 2 -->
+                <div style="display:flex; border-bottom:1px solid #C9BFA8; height:74px">
+                  <div style="position:relative; width:25%; border-right:1px solid #C9BFA8; padding:4px 6px">
+                    <div style="display:flex; justify-content:space-between"><span style="font-size:7.5px; color:#6E6449">Tireur</span><span style="font-size:8px; color:#6E6449">الساحب</span></div>
+                    <div style="font-size:10.5px; font-weight:600; color:#1D3A6B; margin-top:4px">ADACTIM</div>
+                    <div style="font-size:7.5px; color:#6E6449; margin-top:2px; line-height:1.3">Chotrana 2 · 2036 Soukra<br />Tél 31 34 00 00 — Fax 70 72 11 63</div>
+                  </div>
+                  <div style="width:37%; border-right:1px solid #C9BFA8; padding:5px 6px; display:flex; flex-direction:column; gap:4px">
+                    <div style="display:flex; align-items:flex-start; gap:6px">
+                      <span style="font-size:7.5px; color:#6E6449; line-height:1.35">Contre cette lettre de change (Protestable*)<br />payer à l'ordre de</span>
+                      <div style="margin-left:auto; display:flex; gap:8px; align-items:center">
+                        <div style="display:flex; flex-direction:column; align-items:center; gap:1px"><span style="width:9px; height:9px; border:1px solid #6E6449"></span><span style="font-size:7px; color:#6E6449">Non</span></div>
+                        <div style="display:flex; flex-direction:column; align-items:center; gap:1px"><span style="width:9px; height:9px; border:1px solid #6E6449"></span><span style="font-size:7px; color:#6E6449">Oui</span></div>
+                      </div>
+                    </div>
+                    <div style="border-bottom:1px dotted #B9AF95; padding-bottom:2px; font-size:11px; font-weight:600; color:#1D3A6B">SPG</div>
+                    <span style="font-size:7.5px; color:#6E6449; text-align:right">مقابل هاته الكمبيالة (القابلة للاحتجاج) إدفعوا لأمر</span>
+                  </div>
+                  <div style="position:relative; flex:1; padding:4px 8px; outline:1.5px solid #B3600A; outline-offset:-2px; background:rgba(179,96,10,.07)">
+                    <div style="display:flex; justify-content:space-between"><span style="font-size:7.5px; color:#6E6449">Montant</span><span style="font-size:8px; color:#6E6449">المبلغ</span></div>
+                    <div style="font-size:10px; color:#B3600A; font-style:italic; margin-top:8px">— case non renseignée —</div>
+                    <span style="position:absolute; right:-1px; top:-1px; background:#B3600A; color:#fff; font-size:7.5px; padding:1px 5px; letter-spacing:.4px">AVERTISSEMENT · occ. 2</span>
+                  </div>
+                </div>
+
+                <!-- montant en lettres -->
+                <div style="position:relative; border-bottom:1px solid #C9BFA8; padding:4px 8px; height:46px; outline:1.5px solid #1E5C8F; outline-offset:-2px; background:rgba(30,92,143,.06)">
+                  <div style="display:flex; justify-content:space-between"><span style="font-size:7.5px; color:#6E6449">Montant en lettres</span><span style="font-size:8px; color:#6E6449">المبلغ بلسان القلم</span></div>
+                  <div style="font-size:11.5px; color:#1D3A6B; font-weight:500; margin-top:3px; border-bottom:1px dotted #B9AF95">Huit mille cent dix-sept dinars, 504 millimes</div>
+                  <span style="position:absolute; left:-1px; top:-1px; background:#1E5C8F; color:#fff; font-size:7.5px; padding:1px 5px; letter-spacing:.4px">OCR · NLP</span>
+                </div>
+
+                <!-- rangée création / cédant -->
+                <div style="display:flex; border-bottom:1px solid #C9BFA8; height:44px">
+                  <div style="position:relative; width:16%; border-right:1px solid #C9BFA8; padding:3px 6px; outline:1.5px solid #1E5C8F; outline-offset:-2px; background:rgba(30,92,143,.06)">
+                    <span style="font-size:7px; color:#6E6449">Lieu de création</span>
+                    <div style="font-size:10.5px; color:#1D3A6B; font-weight:600; margin-top:3px">Tunis</div>
+                  </div>
+                  <div style="position:relative; width:19%; border-right:1px solid #C9BFA8; padding:3px 6px; outline:1.5px solid #1E5C8F; outline-offset:-2px; background:rgba(30,92,143,.06)">
+                    <span style="font-size:7px; color:#6E6449">Date de création</span>
+                    <div style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:#1D3A6B; font-weight:600; margin-top:3px">05/08/2026</div>
+                    <span style="position:absolute; left:-1px; bottom:-1px; background:#B3600A; color:#fff; font-size:7.5px; padding:1px 5px; letter-spacing:.4px">ALERTE</span>
+                  </div>
+                  <div style="position:relative; width:19%; border-right:1px solid #C9BFA8; padding:3px 6px; outline:1.5px solid #1E5C8F; outline-offset:-2px; background:rgba(30,92,143,.06)">
+                    <span style="font-size:7px; color:#6E6449">Echéance</span>
+                    <div style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:#1D3A6B; font-weight:600; margin-top:3px">28/08/2026</div>
+                    <span style="position:absolute; right:-1px; bottom:-1px; background:#1E5C8F; color:#fff; font-size:7.5px; padding:1px 5px; letter-spacing:.4px">occ. 2</span>
+                  </div>
+                  <div style="width:26%; border-right:1px solid #C9BFA8; padding:3px 6px">
+                    <span style="font-size:7px; color:#6E6449">Nom du cédant · اسم المحيل</span>
+                    <div style="font-size:10.5px; color:#1D3A6B; font-weight:600; margin-top:3px">ADACTIM</div>
+                  </div>
+                  <div style="flex:1; padding:3px 6px; display:flex; flex-direction:column">
+                    <span style="font-size:7px; color:#6E6449">Codes réservés</span>
+                    <div style="display:flex; gap:3px; margin-top:4px">
+                      <span style="width:14px; height:14px; border:1px solid #C9BFA8"></span><span style="width:14px; height:14px; border:1px solid #C9BFA8"></span><span style="width:14px; height:14px; border:1px solid #C9BFA8"></span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- rangée basse -->
+                <div style="display:flex; height:112px; border-bottom:1px solid #C9BFA8">
+                  <div style="width:52%; border-right:1px solid #C9BFA8; display:flex; flex-direction:column">
+                    <div style="position:relative; border-bottom:1px solid #C9BFA8; padding:3px 6px; outline:1.5px solid #1E5C8F; outline-offset:-2px; background:rgba(30,92,143,.06)">
+                      <div style="display:flex; justify-content:space-between"><span style="font-size:7.5px; color:#6E6449">RIB ou RIP du Tiré</span><span style="font-size:7.5px; color:#6E6449">المعرف البنكي للمسحوب عليه</span></div>
+                      <div style="font-family:'IBM Plex Mono',monospace; font-size:12.5px; font-weight:600; letter-spacing:.8px; margin-top:2px">11 003 0002917001788 36</div>
+                      <div style="display:flex; gap:26px; font-size:7px; color:#6E6449; margin-top:1px"><span>Code étab.</span><span>Code Agence</span><span style="margin-left:36px">N° de Compte</span></div>
+                      <span style="position:absolute; left:-1px; top:-1px; background:#1E5C8F; color:#fff; font-size:7.5px; padding:1px 5px; letter-spacing:.4px">OCR · occ. 2</span>
+                    </div>
+                    <div style="flex:1; display:flex">
+                      <div style="position:relative; width:52%; border-right:1px solid #C9BFA8; padding:3px 6px; outline:1.5px dashed #7A4FB3; outline-offset:-2px; background:rgba(122,79,179,.05)">
+                        <span style="font-size:7.5px; color:#6E6449">Acceptation · القبول</span>
+                        <div style="position:absolute; left:10px; top:16px; width:52px; height:52px; border:1.4px solid rgba(45,70,145,.5); border-radius:50%; transform:rotate(-7deg); display:flex; flex-direction:column; align-items:center; justify-content:center; color:rgba(45,70,145,.6); line-height:1.1">
+                          <span style="font-size:7px; font-weight:700">ADACTIM</span>
+                          <span style="font-size:4px">MF 1330392/A/A/M/000</span>
+                        </div>
+                        <svg viewBox="0 0 110 50" style="position:absolute; left:26px; top:16px; width:92px; height:50px; opacity:.6"><path d="M4 38 C22 6, 36 44, 54 18 C68 -1, 78 40, 96 22" fill="none" stroke="#1D3A6B" stroke-width="2.2" stroke-linecap="round"></path></svg>
+                        <span style="position:absolute; right:-1px; top:-1px; background:#7A4FB3; color:#fff; font-size:7.5px; padding:1px 5px; letter-spacing:.4px">HUMAIN</span>
+                      </div>
+                      <div style="flex:1; padding:3px 6px"><span style="font-size:7.5px; color:#6E6449">Aval · الكفالة</span></div>
+                    </div>
+                  </div>
+                  <div style="flex:1; display:flex; flex-direction:column">
+                    <div style="display:flex; border-bottom:1px solid #C9BFA8; height:62px">
+                      <div style="width:24%; border-right:1px solid #C9BFA8; padding:3px 5px"><span style="font-size:7.5px; color:#6E6449">Valeur en</span></div>
+                      <div style="position:relative; flex:1; border-right:1px solid #C9BFA8; padding:3px 5px; outline:1.5px solid #1E5C8F; outline-offset:-2px; background:rgba(30,92,143,.06)">
+                        <span style="font-size:7.5px; color:#6E6449">▼ Nom et adresse du Tiré</span>
+                        <div style="font-size:9.5px; color:#1D3A6B; font-weight:600; margin-top:2px; line-height:1.35">Lot 31, Z.I,<br />Chotrana II, 2036 Ariana</div>
+                        <span style="position:absolute; left:-1px; bottom:-1px; background:#1E5C8F; color:#fff; font-size:7.5px; padding:1px 5px; letter-spacing:.4px">NLP</span>
+                      </div>
+                      <div style="width:34%; padding:3px 5px">
+                        <span style="font-size:7.5px; color:#6E6449">Domiciliation</span>
+                        <div style="font-size:9.5px; color:#1D3A6B; font-weight:600; margin-top:2px; line-height:1.3">UBCI Agence Pasteur</div>
+                      </div>
+                    </div>
+                    <div style="position:relative; flex:1; padding:3px 6px; outline:1.5px solid #B3261E; outline-offset:-2px; background:rgba(179,38,30,.06); display:flex; align-items:center; justify-content:space-between">
+                      <span style="font-size:7.5px; color:#6E6449">Signature du tireur ▲</span>
+                      <span style="font-size:9px; color:#B3261E; font-style:italic">— case vide —</span>
+                      <span style="font-size:7.5px; color:#6E6449">توقيع الساحب</span>
+                      <span style="position:absolute; right:-1px; bottom:-1px; background:#B3261E; color:#fff; font-size:7.5px; padding:1px 5px; letter-spacing:.4px">MENTION MANQUANTE</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- pied MICR -->
+                <div style="display:flex; align-items:center; gap:14px; padding:6px 10px; height:44px">
+                  <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:600; letter-spacing:1px">⑈011570763437⑈</span>
+                  <div style="margin-left:auto; display:flex; flex-direction:column; align-items:center; gap:2px">
+                    <div style="display:flex; align-items:flex-end; gap:1px; height:20px">
+                      <span style="width:2px; height:100%; background:#2B2517"></span><span style="width:1px; height:100%; background:#2B2517"></span><span style="width:3px; height:100%; background:#2B2517"></span><span style="width:1px; height:100%; background:#2B2517"></span><span style="width:2px; height:100%; background:#2B2517"></span><span style="width:1px; height:100%; background:#2B2517"></span><span style="width:3px; height:100%; background:#2B2517"></span><span style="width:2px; height:100%; background:#2B2517"></span><span style="width:1px; height:100%; background:#2B2517"></span><span style="width:2px; height:100%; background:#2B2517"></span><span style="width:3px; height:100%; background:#2B2517"></span><span style="width:1px; height:100%; background:#2B2517"></span><span style="width:2px; height:100%; background:#2B2517"></span><span style="width:1px; height:100%; background:#2B2517"></span><span style="width:3px; height:100%; background:#2B2517"></span><span style="width:2px; height:100%; background:#2B2517"></span><span style="width:1px; height:100%; background:#2B2517"></span><span style="width:2px; height:100%; background:#2B2517"></span>
+                    </div>
+                    <span style="font-family:'IBM Plex Mono',monospace; font-size:9px">&lt;011570763437&gt;</span>
+                  </div>
+                  <div style="margin-left:auto; width:34px; height:32px; border:1px solid #C08B84; display:flex; align-items:center; justify-content:center; color:#B0463A; font-size:5.5px; text-align:center; line-height:1.2">LETTRE<br />DE<br />CHANGE</div>
+                </div>
+
+                <!-- overlay traitement IA -->
+                <sc-if value="{{ processing }}" hint-placeholder-val="{{ false }}">
+                  <div style="position:absolute; inset:0; background:rgba(11,34,57,.78); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px">
+                    <div style="position:absolute; left:0; right:0; top:0; height:2px; background:linear-gradient(90deg,transparent,#4FA3E3,transparent); animation:scanline 1.9s linear infinite"></div>
+                    <div style="width:26px; height:26px; border:2.5px solid rgba(255,255,255,.25); border-top-color:#7EC0F5; border-radius:50%; animation:spin .9s linear infinite"></div>
+                    <div style="color:#E8F1F9; font-size:12.5px; font-weight:500">{{ stepLabel }}</div>
+                    <div style="width:280px; height:5px; background:rgba(255,255,255,.18); border-radius:3px; overflow:hidden">
+                      <div style="height:100%; background:#4FA3E3; animation:fillbar 2.8s linear forwards"></div>
+                    </div>
+                    <div style="color:#9FBFDA; font-size:10.5px; font-family:'IBM Plex Mono',monospace">{{ pctLabel }}</div>
+                  </div>
+                </sc-if>
+              </div>
+              </sc-if>
+
+              <sc-if value="{{ isVerso }}" hint-placeholder-val="{{ false }}">
+              <div style="position:relative; background:#FCFBF7; border:1px solid #B9B199; border-radius:2px; overflow:hidden; height:466px; display:flex; flex-direction:column; font-size:10px; color:#3A3324">
+
+                <div style="height:78px; border-bottom:1px solid #2B2517; flex:0 0 78px"></div>
+
+                <div style="position:relative; padding:10px 16px 6px; display:flex; gap:16px; align-items:flex-start; min-height:96px">
+                  <span style="position:absolute; left:16px; right:16px; top:14px; text-align:center; font-family:Georgia,serif; font-weight:700; font-size:34px; letter-spacing:2px; color:rgba(120,110,190,.32); white-space:nowrap; overflow:hidden">ORDRE DE PAIEMENT</span>
+                  <span style="position:absolute; right:16px; top:8px; font-size:30px; font-weight:700; color:rgba(120,110,190,.32)">قصاصة أمر بالدفع</span>
+                  <span style="position:absolute; left:0; right:0; top:56px; text-align:center; font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.6px; color:rgba(60,50,40,.26)">11 003 0002917001788 36</span>
+                  <div style="position:relative; width:46%; margin-left:auto; font-size:10.5px; line-height:1.45; text-align:center; font-weight:600; color:#2B2517">Veuillez régler à l'échéance, par débit de notre compte le montant de cette lettre de change à l'ordre du bénéficiaire.</div>
+                  <div style="position:relative; width:34%; font-size:10px; line-height:1.5; text-align:right; color:#2B2517; direction:rtl">ادفعوا عند حلول الأجل بالخصم من حسابنا مبلغ هذه الكمبيالة لأمر المستفيد</div>
+                </div>
+
+                <div style="position:relative; border-bottom:1px dashed #9A927E; padding:2px 16px 6px; display:flex; align-items:center">
+                  <span style="flex:1; text-align:center; font-style:italic; font-size:10px; color:#3A3324">Ne pas détacher le coupon</span>
+                  <span style="flex:1; text-align:center; font-size:10px; color:#3A3324">لا تقطعوا هاته القصاصة</span>
+                </div>
+
+                <div style="display:flex; gap:18px; padding:9px 16px; border-bottom:1px dashed #9A927E">
+                  <div style="width:50%; font-size:9px; line-height:1.5; color:#2B2517; text-align:justify"><b style="font-style:italic">NOTE :</b> <span style="font-style:italic">Le défaut de paiement de cette lettre de change à l'échéance, rend sans préavis, les lettres de change non encore échues immédiatement exigibles et le débiteur en suporte à partir de cette date, l'intérêt légal appliqué en matière commerciale. Tout litige auquel la présente lettre de change pourrait donner lieu sera résolu par les tribunaux compétents.</span></div>
+                  <div style="flex:1; display:flex; flex-direction:column; gap:5px; direction:rtl">
+                    <span style="font-size:9px; line-height:1.6; color:#2B2517; text-align:justify"><b>تنبيه :</b> إن عدم خلاص هاته الكمبيالة عند حلول الأجل يجعل بقية الكمبيالات التي لم يحل أجلها واجبة الأداء حالا ودون سابق إنذار ويتحمل المدين ابتداء من هذا التاريخ الفائض القانوني المعتمد في المادة التجارية. إن النزاعات التي يمكن أن تنجر عن هذه الكمبيالة ترجع بالنظر إلى المحاكم المختصة.</span>
+                    <span style="font-size:8px; font-weight:700; color:#2B2517; text-align:center; direction:ltr">Le droit d'impression est réservé à l'IORT (autorisation du ministère des finances n° 595 du 17/05/2003)</span>
+                  </div>
+                </div>
+
+                <div style="display:flex; align-items:center; justify-content:center; gap:10px; padding:5px 16px; background:rgba(122,79,179,.06)">
+                  <span style="font-size:10.5px; font-weight:600; font-style:italic; color:#3F2A5E">Réservé à l'endossement</span>
+                  <span style="font-size:10px; color:#5E3A8C">▼</span>
+                  <span style="font-size:10.5px; font-weight:600; color:#3F2A5E">خاص بالتظهير</span>
+                </div>
+
+                <div style="position:relative; flex:1; margin:8px 16px 14px; border:1.5px dashed #7A4FB3; background:rgba(122,79,179,.04); border-radius:3px; padding:8px 10px">
+                  <div style="font-size:11px; color:#1D3A6B; font-weight:600">Payez à l'ordre de SPG</div>
+                  <div style="position:absolute; left:14px; bottom:12px; width:62px; height:62px; border:1.4px solid rgba(45,70,145,.5); border-radius:50%; transform:rotate(-8deg); display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; color:rgba(45,70,145,.62); line-height:1.15">
+                    <span style="font-size:7.5px; font-weight:700; letter-spacing:.3px">ADACTIM</span>
+                    <span style="font-size:4.5px">MF 1330392/A/A/M/000</span>
+                  </div>
+                  <svg viewBox="0 0 140 60" style="position:absolute; left:70px; bottom:14px; width:118px; height:58px; opacity:.6"><path d="M6 46 C26 8, 44 54, 64 20 C80 -4, 92 48, 112 26" fill="none" stroke="#1D3A6B" stroke-width="2.2" stroke-linecap="round"></path></svg>
+                  <span style="position:absolute; right:10px; bottom:8px; font-size:8.5px; color:#8C8266">Signature et cachet de l'adhérent · إمضاء وختم المظهر</span>
+                  <span style="position:absolute; right:-1px; top:-1px; background:#7A4FB3; color:#fff; font-size:7.5px; padding:1px 5px; letter-spacing:.4px">HUMAIN · UC-10</span>
+                </div>
+              </div>
+              </sc-if>
+            </div>
+          </div>
+
+          <!-- bandeau MOA -->
+          <sc-if value="{{ showMoa }}" hint-placeholder-val="{{ true }}">
+          <div style="background:#F5F7FA; border:1px solid #DCE3EA; border-left:3px solid #8496A8; border-radius:5px; padding:11px 14px; display:flex; gap:11px; align-items:flex-start">
+            <span style="font-size:12px; color:#6B7E90; margin-top:1px">ⓘ</span>
+            <div style="display:flex; flex-direction:column; gap:5px">
+              <span style="font-size:12px; font-weight:600; color:#3C4E5F">Points à clarifier avec la MOA</span>
+              <span style="font-size:11.5px; color:#5F7182; line-height:1.55">Case « Protestable » (Non / Oui) laissée vide sur cette traite : règle de gestion non arbitrée — l'agent ne la contrôle pas et ne bloque pas la remise. Idem pour le champ « Valeur en » non renseigné. Point de vigilance OCR : le nom de l'agence bancaire peut déborder de son cadre — les textes hors zone sont rattachés au champ « Domiciliation ».</span>
+            </div>
+            <span style="margin-left:auto; font-size:11px; color:#6B7E90; white-space:nowrap">2 points ouverts</span>
+          </div>
+          </sc-if>
+          </div>
+        </div>
+
+        <!-- colonne droite : résultats de l'analyse -->
+        <div style="display:flex; flex-direction:column; gap:14px">
+
+          <sc-if value="{{ processing }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#fff; border:1px solid #D7DEE7; border-radius:6px; padding:16px; display:flex; flex-direction:column; gap:12px">
+              <div style="display:flex; align-items:center; gap:9px">
+                <span style="width:14px; height:14px; border:2px solid #C6DAEC; border-top-color:#1E5C8F; border-radius:50%; animation:spin .9s linear infinite"></span>
+                <span style="font-size:12.5px; font-weight:600; color:#3C4E5F">Extraction en cours — résultats indisponibles</span>
+              </div>
+              <div style="height:11px; border-radius:3px; background:#EEF1F5; width:62%; animation:pulse 1.4s infinite"></div>
+              <div style="height:11px; border-radius:3px; background:#EEF1F5; width:88%; animation:pulse 1.4s infinite .2s"></div>
+              <div style="height:11px; border-radius:3px; background:#EEF1F5; width:74%; animation:pulse 1.4s infinite .4s"></div>
+              <div style="height:11px; border-radius:3px; background:#EEF1F5; width:46%; animation:pulse 1.4s infinite .6s"></div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ ready }}" hint-placeholder-val="{{ true }}">
+
+          <!-- verdict de l'agent -->
+          <div style="background:#fff; border:1px solid #D7DEE7; border-radius:6px; overflow:hidden">
+            <div style="padding:10px 14px; border-bottom:1px solid #E4E9EF; display:flex; align-items:center; gap:9px">
+              <span style="font-size:12.5px; font-weight:600">Verdict de l'agent</span>
+              <span style="margin-left:auto; font-size:11px; color:#6B7E90; font-family:'IBM Plex Mono',monospace">analyse du 11/08/26 09:13</span>
+            </div>
+            <div style="display:grid; grid-template-columns:repeat(3,1fr)">
+              <div style="padding:12px 14px; border-right:1px solid #EDF1F5; display:flex; flex-direction:column; gap:4px">
+                <span style="font-size:10.5px; text-transform:uppercase; letter-spacing:.7px; color:#6B7E90">Contrôles automatiques</span>
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:19px; font-weight:600; color:#1E7A4B">17 / 19</span>
+                <span style="font-size:11px; color:#6B7E90">conformes</span>
+              </div>
+              <div style="padding:12px 14px; border-right:1px solid #EDF1F5; display:flex; flex-direction:column; gap:4px">
+                <span style="font-size:10.5px; text-transform:uppercase; letter-spacing:.7px; color:#6B7E90">Contrôles manuels</span>
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:19px; font-weight:600; color:#5E3A8C">{{ checkCount }} / 4</span>
+                <span style="font-size:11px; color:#6B7E90">zones statuées</span>
+              </div>
+              <div style="padding:12px 14px; display:flex; flex-direction:column; gap:4px">
+                <span style="font-size:10.5px; text-transform:uppercase; letter-spacing:.7px; color:#6B7E90">Écarts restants</span>
+                <span style="{{ ecartTotalStyle }}">{{ ecartTotal }}</span>
+                <span style="font-size:11px; color:#6B7E90">{{ ecartDetail }}</span>
+              </div>
+            </div>
+            <sc-for list="{{ ecarts }}" as="e" hint-placeholder-count="3">
+              <div style="{{ e.rowStyle }}">
+                <span style="{{ e.pillStyle }}">{{ e.niveau }}</span>
+                <div style="display:flex; flex-direction:column; gap:3px; flex:1; min-width:0">
+                  <span style="font-size:12.5px; font-weight:600; color:#2A3B4C">{{ e.titre }}</span>
+                  <span style="font-size:11.5px; color:#5F7182; line-height:1.5">{{ e.detail }}</span>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+
+          <!-- mentions obligatoires -->
+          <div style="background:#fff; border:1px solid #D7DEE7; border-radius:6px; overflow:hidden">
+            <div style="padding:10px 14px; border-bottom:1px solid #E4E9EF; display:flex; align-items:center; gap:9px">
+              <span style="width:18px; height:18px; border-radius:3px; background:#E8F0F8; color:#1E5C8F; font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center">§</span>
+              <span style="font-size:12.5px; font-weight:600">Mentions obligatoires de la lettre de change</span>
+              <span style="margin-left:auto; font-size:10.5px; text-transform:uppercase; letter-spacing:.6px; color:#1E5C8F; background:#E8F0F8; border-radius:3px; padding:2px 7px; font-weight:600">Automatisé · OCR</span>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr">
+              <sc-for list="{{ mentions }}" as="m" hint-placeholder-count="8">
+                <div style="{{ m.rowStyle }}">
+                  <span style="{{ m.iconStyle }}">{{ m.icon }}</span>
+                  <div style="display:flex; flex-direction:column; gap:2px; min-width:0">
+                    <span style="font-size:11.5px; font-weight:600; color:#2A3B4C">{{ m.label }}</span>
+                    <span style="font-size:10.5px; color:#6B7E90; line-height:1.4">{{ m.val }}</span>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="padding:9px 14px; background:#FBEAE8; border-top:1px solid #F0D3D0; display:flex; align-items:flex-start; gap:9px">
+              <span style="color:#B3261E; font-size:12px">⚠</span>
+              <span style="font-size:11.5px; color:#7E2A24; line-height:1.5"><b>Mention manquante — signature du tireur.</b> La case « Signature du tireur » est vide : sans elle la lettre de change ne vaut pas comme effet de commerce et ne peut pas être cédée à SPG. Retour à l'adhérent ADACTIM requis.</span>
+            </div>
+          </div>
+
+          <!-- champs dupliqués -->
+          <div style="background:#fff; border:1px solid #D7DEE7; border-radius:6px; overflow:hidden">
+            <div style="padding:10px 14px; border-bottom:1px solid #E4E9EF; display:flex; align-items:center; gap:9px">
+              <span style="width:18px; height:18px; border-radius:3px; background:#E8F0F8; color:#1E5C8F; font-size:9px; font-weight:700; display:flex; align-items:center; justify-content:center; letter-spacing:.3px">◫</span>
+              <span style="font-size:12.5px; font-weight:600">Contrôle de cohérence des champs dupliqués</span>
+              <span style="margin-left:auto; font-size:10.5px; text-transform:uppercase; letter-spacing:.6px; color:#1E5C8F; background:#E8F0F8; border-radius:3px; padding:2px 7px; font-weight:600">Automatisé · OCR</span>
+            </div>
+            <table style="width:100%; border-collapse:collapse; font-size:12px">
+              <thead>
+                <tr style="background:#F7F9FB; color:#546678">
+                  <th style="text-align:left; padding:7px 14px; font-size:10px; letter-spacing:.6px; text-transform:uppercase; font-weight:600; border-bottom:1px solid #E4E9EF">Champ</th>
+                  <th style="text-align:left; padding:7px 10px; font-size:10px; letter-spacing:.6px; text-transform:uppercase; font-weight:600; border-bottom:1px solid #E4E9EF">Occurrence 1</th>
+                  <th style="text-align:left; padding:7px 10px; font-size:10px; letter-spacing:.6px; text-transform:uppercase; font-weight:600; border-bottom:1px solid #E4E9EF">Occurrence 2</th>
+                  <th style="text-align:right; padding:7px 14px; font-size:10px; letter-spacing:.6px; text-transform:uppercase; font-weight:600; border-bottom:1px solid #E4E9EF">Verdict</th>
+                </tr>
+              </thead>
+              <tbody>
+                <sc-for list="{{ fields }}" as="f" hint-placeholder-count="5">
+                  <tr style="{{ f.rowStyle }}">
+                    <td style="padding:9px 14px; border-bottom:1px solid #EDF1F5; font-weight:600; color:#2A3B4C">{{ f.label }}</td>
+                    <td style="padding:9px 10px; border-bottom:1px solid #EDF1F5; font-family:'IBM Plex Mono',monospace; font-size:11.5px">{{ f.o1 }}</td>
+                    <td style="padding:9px 10px; border-bottom:1px solid #EDF1F5; font-family:'IBM Plex Mono',monospace; font-size:11.5px">{{ f.o2 }}</td>
+                    <td style="padding:9px 14px; border-bottom:1px solid #EDF1F5; text-align:right"><span style="{{ f.badgeStyle }}">{{ f.badge }}</span></td>
+                  </tr>
+                </sc-for>
+              </tbody>
+            </table>
+            <div style="padding:9px 14px; background:#FDF1E2; border-top:1px solid #EFD6B4; display:flex; align-items:flex-start; gap:9px">
+              <span style="color:#B3600A; font-size:12px">⚠</span>
+              <span style="font-size:11.5px; color:#7A4306; line-height:1.5"><b>1 avertissement</b> — la seconde case « Montant » est vide : le contrôle de redondance chiffres/chiffres n'a pas pu être exécuté. La cohérence est établie par le montant en lettres, qui correspond exactement à 8 117,504 DT.</span>
+            </div>
+          </div>
+
+          <!-- contrôles dates et RIB -->
+          <div style="background:#fff; border:1px solid #D7DEE7; border-radius:6px; overflow:hidden">
+            <div style="padding:10px 14px; border-bottom:1px solid #E4E9EF; display:flex; align-items:center; gap:9px">
+              <span style="width:18px; height:18px; border-radius:3px; background:#E8F0F8; color:#1E5C8F; font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center">⌗</span>
+              <span style="font-size:12.5px; font-weight:600">Contrôles de dates et reconstitution du RIB</span>
+              <span style="margin-left:auto; font-size:10.5px; text-transform:uppercase; letter-spacing:.6px; color:#1E5C8F; background:#E8F0F8; border-radius:3px; padding:2px 7px; font-weight:600">Automatisé · OCR</span>
+            </div>
+            <div style="padding:12px 14px; border-bottom:1px solid #EDF1F5; display:flex; flex-direction:column; gap:8px">
+              <span style="font-size:11px; text-transform:uppercase; letter-spacing:.6px; color:#6B7E90">RIB du tiré reconstitué — 2 + 3 + 13 + 2</span>
+              <div style="display:flex; align-items:stretch; gap:8px">
+                <div style="display:flex; flex-direction:column; gap:3px; align-items:center; background:#F5F7FA; border:1px solid #DCE3EA; border-radius:4px; padding:6px 12px">
+                  <span style="font-family:'IBM Plex Mono',monospace; font-size:14px; font-weight:600">11</span>
+                  <span style="font-size:9.5px; color:#6B7E90">Code étab. · UBCI</span>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:3px; align-items:center; background:#F5F7FA; border:1px solid #DCE3EA; border-radius:4px; padding:6px 12px">
+                  <span style="font-family:'IBM Plex Mono',monospace; font-size:14px; font-weight:600">003</span>
+                  <span style="font-size:9.5px; color:#6B7E90">Agence Pasteur</span>
+                </div>
+                <div style="flex:1; display:flex; flex-direction:column; gap:3px; align-items:center; background:#F5F7FA; border:1px solid #DCE3EA; border-radius:4px; padding:6px 12px">
+                  <span style="font-family:'IBM Plex Mono',monospace; font-size:14px; font-weight:600; letter-spacing:.6px">0002917001788</span>
+                  <span style="font-size:9.5px; color:#6B7E90">N° de compte</span>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:3px; align-items:center; background:#E8F4ED; border:1px solid #C2E0CE; border-radius:4px; padding:6px 12px">
+                  <span style="font-family:'IBM Plex Mono',monospace; font-size:14px; font-weight:600; color:#155F3A">36</span>
+                  <span style="font-size:9.5px; color:#155F3A">Clé valide</span>
+                </div>
+              </div>
+              <span style="font-size:11px; color:#6B7E90; line-height:1.45">20 chiffres identiques aux 2 emplacements du recto et strictement égaux au RIB du débiteur dans IMX. Domiciliation lue « UBCI Agence Pasteur », cohérente avec les codes 11 / 003.</span>
+            </div>
+            <sc-for list="{{ dateRules }}" as="d" hint-placeholder-count="4">
+              <div style="{{ d.rowStyle }}">
+                <span style="{{ d.iconStyle }}">{{ d.icon }}</span>
+                <span style="font-size:12px; font-weight:600; color:#2A3B4C; flex:1">{{ d.label }}</span>
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:#3C4E5F">{{ d.val }}</span>
+              </div>
+            </sc-for>
+          </div>
+
+          <!-- rapprochement NLP -->
+          <div style="background:#fff; border:1px solid #D7DEE7; border-radius:6px; overflow:hidden">
+            <div style="padding:10px 14px; border-bottom:1px solid #E4E9EF; display:flex; align-items:center; gap:9px">
+              <span style="width:18px; height:18px; border-radius:3px; background:#E8F0F8; color:#1E5C8F; font-size:9px; font-weight:700; display:flex; align-items:center; justify-content:center">≈</span>
+              <span style="font-size:12.5px; font-weight:600">Rapprochement NLP au référentiel IMX</span>
+              <span style="margin-left:auto; font-size:10.5px; text-transform:uppercase; letter-spacing:.6px; color:#1E5C8F; background:#E8F0F8; border-radius:3px; padding:2px 7px; font-weight:600">Automatisé · NLP</span>
+            </div>
+            <div style="display:flex; flex-direction:column">
+              <sc-for list="{{ nlp }}" as="n" hint-placeholder-count="2">
+                <div style="padding:11px 14px; border-bottom:1px solid #EDF1F5; display:flex; align-items:center; gap:12px">
+                  <span style="font-size:10.5px; text-transform:uppercase; letter-spacing:.6px; color:#6B7E90; width:44px">{{ n.role }}</span>
+                  <div style="display:flex; flex-direction:column; gap:3px; min-width:0; flex:1">
+                    <span style="font-size:12px"><b>{{ n.scan }}</b> <span style="color:#8B9AA8">↔</span> {{ n.ref }}</span>
+                    <div style="height:5px; border-radius:3px; background:#E4E9EF; overflow:hidden; max-width:240px">
+                      <div style="{{ n.barStyle }}"></div>
+                    </div>
+                  </div>
+                  <span style="{{ n.badgeStyle }}">{{ n.score }}</span>
+                </div>
+              </sc-for>
+              <div style="padding:9px 14px; border-bottom:1px solid #EDF1F5; display:flex; align-items:center; gap:9px; background:#FCFDFE">
+                <span style="font-size:11px; color:#6B7E90; line-height:1.45">Seuil de correspondance 95 % (Seuil_1) · 3 variantes de raison sociale comparées par entité dans IMX. « Payer à l'ordre de » : bénéficiaire SPG au lieu de l'adhérent ADACTIM — cohérent avec une cession de créance, à confirmer au contrat.</span>
+              </div>
+              <div style="padding:11px 14px; background:#FDF1E2; display:flex; gap:10px; align-items:flex-start">
+                <span style="color:#B3600A; font-size:12px; margin-top:1px">⚠</span>
+                <div style="display:flex; flex-direction:column; gap:3px">
+                  <span style="font-size:11.5px; font-weight:600; color:#7A4306">Risque avance sur facture</span>
+                  <span style="font-size:11.5px; color:#8A5312; line-height:1.5">Date de création de la traite <b>05/08/2026</b> antérieure à la date de la facture rattachée <b>FA-26-0117 du 07/08/2026</b>. À justifier par l'adhérent avant validation.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- vérifications manuelles -->
+          <div style="background:#fff; border:1px solid #C9B8E0; border-radius:6px; overflow:hidden">
+            <div style="padding:10px 14px; background:#F6F2FB; border-bottom:1px solid #E4D9F2; display:flex; align-items:center; gap:9px">
+              <span style="width:18px; height:18px; border-radius:3px; background:#7A4FB3; color:#fff; font-size:10px; display:flex; align-items:center; justify-content:center">✋</span>
+              <span style="font-size:12.5px; font-weight:600; color:#3F2A5E">Vérifications manuelles obligatoires</span>
+              <span style="margin-left:auto; font-size:11px; font-family:'IBM Plex Mono',monospace; color:#5E3A8C; font-weight:600">{{ checkCount }} / 4</span>
+            </div>
+            <div style="padding:4px 0">
+              <sc-for list="{{ checks }}" as="c" hint-placeholder-count="4">
+                <div style="{{ c.rowStyle }}">
+                  <div onClick="{{ c.showFace }}" title="Afficher la zone sur le document" style="width:82px; height:52px; border:1px solid #D7DEE7; border-radius:3px; background:#FBF9F3; position:relative; overflow:hidden; flex:0 0 82px; cursor:pointer">
+                    <span style="position:absolute; left:3px; top:2px; font-size:7px; letter-spacing:.3px; color:#8C8266">{{ c.zone }}</span>
+                    <svg viewBox="0 0 120 46" style="position:absolute; left:0; bottom:2px; width:100%; height:34px; opacity:.6"><path d="{{ c.path }}" fill="none" stroke="#1D2B4A" stroke-width="2.4" stroke-linecap="round"></path></svg>
+                    <span style="{{ c.emptyStyle }}">zone vide</span>
+                  </div>
+                  <div style="display:flex; flex-direction:column; gap:3px; min-width:0; flex:1">
+                    <div style="display:flex; align-items:center; gap:7px">
+                      <span style="font-size:12.5px; font-weight:600; color:#2A3B4C">{{ c.label }}</span>
+                      <span style="font-size:10px; color:#5E3A8C; background:#F1E9FA; border-radius:3px; padding:1px 5px">{{ c.face }}</span>
+                    </div>
+                    <span style="font-size:11px; color:#6B7E90; line-height:1.45">{{ c.hint }}</span>
+                  </div>
+                  <div style="display:flex; gap:6px; flex:0 0 auto">
+                    <div onClick="{{ c.setOk }}" style="{{ c.okStyle }}">✓ Conforme</div>
+                    <div onClick="{{ c.setKo }}" style="{{ c.koStyle }}">⚑ Anomalie</div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="padding:10px 14px; border-top:1px solid #EDF1F5; display:flex; align-items:center; gap:10px">
+              <span style="font-size:11px; color:#6B7E90; flex:1">{{ manualNote }}</span>
+            </div>
+          </div>
+          <!-- décision caissier -->
+          <div style="background:#fff; border:1px solid #D7DEE7; border-radius:6px; overflow:hidden">
+            <div style="padding:11px 14px; border-bottom:1px solid #E4E9EF; display:flex; align-items:center">
+              <span style="font-size:12.5px; font-weight:600">Décision du caissier</span>
+              <span style="margin-left:auto; font-size:11px; color:#6B7E90">Étape finale · tracée au journal</span>
+            </div>
+            <div style="padding:14px; display:flex; flex-direction:column; gap:10px">
+              <div style="{{ recoStyle }}">
+                <div style="display:flex; align-items:center; gap:7px">
+                  <span style="font-size:11px">◈</span>
+                  <span style="font-size:11px; text-transform:uppercase; letter-spacing:.6px; font-weight:600">Recommandation de l'agent</span>
+                </div>
+                <span style="font-size:12px; font-weight:600">{{ recoTitre }}</span>
+                <span style="font-size:11px; line-height:1.5">{{ recoDetail }}</span>
+              </div>
+              <sc-if value="{{ hasDecision }}" hint-placeholder-val="{{ false }}">
+                <div style="{{ decisionBoxStyle }}">
+                  <span style="font-size:12px; font-weight:600">{{ decisionLabel }}</span>
+                  <span style="font-size:11px; line-height:1.5">{{ decisionHint }}</span>
+                </div>
+              </sc-if>
+              <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:9px">
+                <button onClick="{{ decideValider }}" disabled="{{ bloque }}" style="{{ validerStyle }}" style-hover="filter:brightness(.94)">
+                  <span style="font-size:12.5px; font-weight:600">✓ Valider la traite</span>
+                  <span style="font-size:10.5px; opacity:.85; line-height:1.35">{{ validerHint }}</span>
+                </button>
+                <button onClick="{{ decideRenvoyer }}" style="text-align:left; background:#fff; color:#7A4306; border:1px solid #E2C79E; border-radius:5px; padding:11px 13px; font-family:inherit; cursor:pointer; display:flex; flex-direction:column; gap:2px" style-hover="background:#FDF1E2">
+                  <span style="font-size:12.5px; font-weight:600">↩ Renvoyer</span>
+                  <span style="font-size:10.5px; color:#8A5312; line-height:1.35">Complément demandé à ADACTIM</span>
+                </button>
+                <button onClick="{{ decideFraude }}" style="text-align:left; background:#fff; color:#B3261E; border:1px solid #ECC3BF; border-radius:5px; padding:11px 13px; font-family:inherit; cursor:pointer; display:flex; flex-direction:column; gap:2px" style-hover="background:#FBEAE8">
+                  <span style="font-size:12.5px; font-weight:600">⚑ Signaler fraude</span>
+                  <span style="font-size:10.5px; color:#8E3A33; line-height:1.35">Escalade conformité · gel</span>
+                </button>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:6px">
+                <span style="font-size:10.5px; text-transform:uppercase; letter-spacing:.7px; color:#6B7E90">Commentaire (obligatoire si écart)</span>
+                <div style="border:1px solid #DCE3EA; border-radius:4px; padding:8px 10px; min-height:54px; font-size:11.5px; color:#9AA9B7; background:#FCFDFE">Signature du tireur contrôlée sur l'original papier du 11/08/2026…</div>
+              </div>
+            </div>
+          </div>
+          </sc-if>
+        </div>
+      </div>
+      </sc-if>
+
+    </div>
+    </sc-if>
+  </main>
+
+</div>
+</sc-if>
+
+<sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed; right:22px; bottom:22px; z-index:60; display:flex; align-items:flex-start; gap:10px; min-width:300px; max-width:420px; padding:12px 14px; border-radius:6px; box-shadow:0 6px 22px rgba(11,34,57,.18); {{ toastStyle }}">
+    <span style="font-size:13px; line-height:1.2">{{ toastIcon }}</span>
+    <div style="display:flex; flex-direction:column; gap:2px">
+      <span style="font-size:12.5px; font-weight:600">{{ toastTitre }}</span>
+      <span style="font-size:11.5px; line-height:1.45">{{ toastDetail }}</span>
+    </div>
+    <span onClick="{{ closeToast }}" style="margin-left:auto; font-size:13px; cursor:pointer; opacity:.6">×</span>
+  </div>
+</sc-if>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;afficherBandeauMoa&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Affichage&quot;}}">
+const badge = (fg, bg, bd) => `display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:2px 8px;border-radius:11px;color:${fg};background:${bg};border:1px solid ${bd}`;
+const STATUS = {
+  'À traiter':            badge('#3C4E5F', '#EEF1F5', '#D7DEE7'),
+  'En cours OCR':         badge('#14507F', '#E8F0F8', '#C6DAEC'),
+  'Écarts à traiter':     badge('#7A4306', '#FDF1E2', '#EFD6B4'),
+  'Contrôle manuel requis': badge('#5E3A8C', '#F3EDFB', '#DCCCF0'),
+  'Renvoyée': badge('#7A4306', '#FDF1E2', '#EFD6B4'),
+  'Fraude signalée': badge('#B3261E', '#FBEAE8', '#ECC3BF'),
+  'Toutes': badge('#3C4E5F', '#EEF1F5', '#D7DEE7'),
+  'Validée':              badge('#155F3A', '#E8F4ED', '#C2E0CE')
+};
+
+class Component extends DCLogic {
+  state = {
+    auth: false, loginUser: '', loginPwd: '', loginRole: 'Caissier',
+    screen: 'list', filter: 'Toutes', page: 1,
+    processing: false, phase: 0,
+    checks: { sigTire: null, accept: null, sigTireur: null, endos: null },
+    files: { recto: null, verso: null }, drag: null, face: 'recto', toast: null,
+    decision: null
+  };
+
+  componentWillUnmount() { clearInterval(this._t); clearTimeout(this._toast); }
+
+  toast(kind, titre, detail) {
+    clearTimeout(this._toast);
+    this.setState({ toast: { kind, titre, detail } });
+    this._toast = setTimeout(() => this.setState({ toast: null }), 4200);
+  }
+
+  inputs = { recto: React.createRef(), verso: React.createRef() };
+
+  take(kind, file) {
+    if (!file) return;
+    const url = file.type && file.type.indexOf('image') === 0 ? URL.createObjectURL(file) : '';
+    this.setState(s => {
+      const files = Object.assign({}, s.files, { [kind]: { name: file.name, url } });
+      const manque = !files.recto ? 'recto' : !files.verso ? 'verso' : null;
+      this.toast('ok', (kind === 'recto' ? 'Recto' : 'Verso') + ' importé — ' + file.name,
+        manque ? 'Il reste le ' + manque + ' à importer avant de lancer l\'analyse.' : 'Recto et verso complets : l\'analyse peut être lancée.');
+      return { drag: null, files };
+    });
+  }
+
+  zone(kind) {
+    const file = this.state.files[kind];
+    const active = this.state.drag === kind;
+    return {
+      style: 'position:relative;flex:1;min-height:132px;border-radius:5px;padding:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;text-align:center;cursor:pointer;overflow:hidden;border:1.5px dashed ' +
+        (active ? '#1E5C8F' : file ? '#C2E0CE' : '#C3CDD8') + ';background:' +
+        (file && file.url ? 'url(' + file.url + ') center/cover no-repeat' : active ? '#EDF4FA' : file ? '#F8FBF9' : '#FBFCFD'),
+      over: (e) => { e.preventDefault(); if (this.state.drag !== kind) this.setState({ drag: kind }); },
+      leave: () => this.setState({ drag: null }),
+      drop: (e) => { e.preventDefault(); this.take(kind, e.dataTransfer.files && e.dataTransfer.files[0]); },
+      pick: () => this.inputs[kind].current && this.inputs[kind].current.click(),
+      change: (e) => this.take(kind, e.target.files && e.target.files[0]),
+      emptyStyle: file ? 'display:none' : 'display:flex;flex-direction:column;align-items:center;gap:4px',
+      nameStyle: file ? "position:absolute;left:8px;bottom:8px;right:8px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#155F3A;background:rgba(255,255,255,.92);border:1px solid #C2E0CE;border-radius:3px;padding:3px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" : 'display:none',
+      name: file ? '✓ ' + file.name : ''
+    };
+  }
+
+  startProcessing() {
+    clearInterval(this._t);
+    this.setState({ screen: 'analyse', processing: true, phase: 0 });
+    this._t = setInterval(() => {
+      this.setState(s => {
+        if (s.phase >= 3) { clearInterval(this._t); return { processing: false }; }
+        return { phase: s.phase + 1 };
+      });
+    }, 700);
+  }
+
+  renderVals() {
+    const s = this.state;
+
+    const traitesData = [
+      ['011570763437', 'ADACTIM', 'LA MÉDITERRANÉENNE', '8 117,504', '28/08/2026', '11/08/26 09:12', 'Écarts à traiter', '14h 20m restantes', 60, '#B3600A', true],
+      ['011570763441', 'ADACTIM', 'SOTUMAG', '742,640', '15/09/2026', '11/08/26 09:12', 'En cours OCR', '14h 20m restantes', 60, '#1E5C8F', false],
+      ['009412870055', 'STE TEXTIS', 'ETS GHARBI FRÈRES', '498,240', '30/08/2026', '11/08/26 08:02', 'Contrôle manuel requis', '13h 10m restantes', 45, '#7A4FB3', false],
+      ['009412870061', 'STE TEXTIS', 'SOCIÉTÉ EL AMEN', '312,000', '12/09/2026', '11/08/26 08:02', 'En cours OCR', '13h 10m restantes', 45, '#1E5C8F', false],
+      ['014778220913', 'COMPTOIR DU SUD', 'COMPTOIR NABEUL', '84,000', '20/08/2026', '10/08/26 16:25', 'Écarts à traiter', '3h 05m restantes', 87, '#B3261E', false],
+      ['014778220920', 'COMPTOIR DU SUD', 'MEDIPLAST', '640,150', '05/09/2026', '10/08/26 16:25', 'À traiter', '3h 05m restantes', 87, '#B3261E', false],
+      ['012309884471', 'SARL EL FATH', 'SOTUMAG', '1 208,000', '18/09/2026', '10/08/26 11:47', 'À traiter', '19h 12m restantes', 20, '#6B7E90', false],
+      ['012309884488', 'SARL EL FATH', 'ETS BEN AMOR', '958,000', '02/09/2026', '09/08/26 15:30', 'Validée', 'Clôturée en 18h 40m', 100, '#1E7A4B', false],
+      ['011570763455', 'ADACTIM', 'SOCIÉTÉ EL AMEN', '1 640,000', '25/09/2026', '09/08/26 14:02', 'À traiter', '21h 30m restantes', 11, '#6B7E90', false],
+      ['016004551102', 'MEDIPLAST', 'LA MÉDITERRANÉENNE', '2 218,900', '10/09/2026', '09/08/26 11:18', 'En cours OCR', '18h 05m restantes', 25, '#1E5C8F', false],
+      ['016004551119', 'MEDIPLAST', 'COMPTOIR NABEUL', '406,320', '22/08/2026', '09/08/26 11:18', 'Écarts à traiter', '6h 40m restantes', 72, '#B3600A', false],
+      ['013882005507', 'ETS BEN AMOR', 'SOTUMAG', '1 074,800', '28/09/2026', '08/08/26 16:44', 'Contrôle manuel requis', '9h 15m restantes', 62, '#7A4FB3', false],
+      ['013882005514', 'ETS BEN AMOR', 'ETS GHARBI FRÈRES', '532,600', '14/09/2026', '08/08/26 16:44', 'Validée', 'Clôturée en 15h 22m', 100, '#1E7A4B', false],
+      ['010445773301', 'STE TEXTIS', 'MEDIPLAST', '2 940,000', '30/09/2026', '08/08/26 09:37', 'À traiter', '22h 48m restantes', 8, '#6B7E90', false]
+    ];
+    const filters = ['Toutes', 'À traiter', 'En cours OCR', 'Écarts à traiter', 'Contrôle manuel requis', 'Validée'];
+    const filtered = traitesData.filter(t => s.filter === 'Toutes' || t[6] === s.filter);
+    const perPage = 6;
+    const nbPages = Math.max(1, Math.ceil(filtered.length / perPage));
+    const page = Math.min(s.page, nbPages);
+    const list = filtered.slice((page - 1) * perPage, page * perPage);
+    const goPage = (p) => () => this.setState({ page: Math.min(nbPages, Math.max(1, p)) });
+
+    const phases = ['Lecture du scan · binarisation et détection des zones',
+      'Extraction OCR des champs dupliqués (10 zones)',
+      'Rapprochement NLP tireur / tiré au référentiel IMX',
+      'Contrôle des mentions, des dates et du RIB'];
+
+    const fieldsData = [
+      ['N° L-CN', '011570763437 (texte)', '011570763437 (code-barres)', true],
+      ['Montant en chiffres', '8 117,504 DT', 'case vide', false],
+      ['Montant en lettres', 'Huit mille cent dix-sept dinars, 504 millimes', '8 117,504 DT', true],
+      ['Échéance', '28/08/2026', '28/08/2026', true],
+      ['RIB tiré', '11 003 0002917001788 36', '11 003 0002917001788 36', true],
+      ['Lieu / date de création', 'Tunis — 05/08/2026', 'Tunis — 05/08/2026', true]
+    ];
+
+    const checksData = [
+      ['sigTire', 'Signature du tiré', 'Cachet ADACTIM détecté dans la case du tiré : rapprocher du spécimen du compte UBCI 11 003 avant de conclure.', 'Recto', 'SIGN. TIRÉ', 'M8 30 C18 12, 30 36, 44 16 C56 2, 62 38, 76 26 C88 16, 100 32, 112 18'],
+      ['accept', 'Mention d\'acceptation', 'Cachet et paraphe présents dans la case Acceptation ; vérifier la lisibilité et la date.', 'Recto', 'ACCEPT.', 'M6 34 C22 8, 34 40, 48 20 S70 6, 82 30 S104 12, 114 24'],
+      ['sigTireur', 'Signature du tireur + cachet', 'Case vide au scan. Marquer « Conforme » uniquement après contrôle de l\'original papier — la levée est tracée dans l\'audit trail.', 'Recto', 'SIGN. TIREUR', ''],
+      ['endos', 'Endossement à l\'ordre de SPG', 'Zone « Réservé à l\'endossement » : mention « payez à l\'ordre de SPG », cachet et signature de l\'adhérent ADACTIM. Aucune donnée OCR — rapprochement UC-10 possible si un spécimen est disponible.', 'Verso', 'ENDOS', 'M10 28 C24 6, 34 34, 50 20 C64 8, 74 34, 90 22 C100 14, 106 26, 114 20']
+    ];
+
+    const vals = Object.values(s.checks);
+    const checkCount = vals.filter(v => v !== null).length;
+    const nbKo = vals.filter(v => v === 'ko').length;
+    const sigTireurOk = s.checks.sigTireur === 'ok';
+    const bloque = checkCount < 4 || nbKo > 0 || !sigTireurOk;
+    const motifBlocage = nbKo > 0 ? 'Anomalie constatée sur une zone de contrôle humain'
+      : checkCount < 4 ? 'Vérifications manuelles incomplètes (' + checkCount + ' / 4)'
+      : 'Signature du tireur non levée sur l\'original';
+
+    const ecarts = [];
+    if (!sigTireurOk) ecarts.push({ niveau: 'Bloquant', titre: 'Signature du tireur absente', detail: 'La case « Signature du tireur » est vide sur le scan. Mention obligatoire : sans elle le titre ne vaut pas lettre de change et ne peut pas être cédé à SPG. Levée possible après contrôle de l\'original papier.' });
+    if (nbKo > 0) ecarts.push({ niveau: 'Bloquant', titre: 'Anomalie sur une zone de contrôle humain', detail: 'Le caissier a marqué ' + nbKo + ' zone(s) en anomalie (signature, cachet ou endossement). Escalade conformité recommandée avant toute décision de financement.' });
+    ecarts.push({ niveau: 'Avertissement', titre: '2e occurrence du montant en chiffres absente', detail: 'Montant porté une seule fois (8 117,504 DT). Le contrôle de redondance OCR n\'a pas pu être exécuté ; la cohérence est établie par le montant en lettres.' });
+    ecarts.push({ niveau: 'Avertissement', titre: 'Traite créée avant la facture rattachée', detail: 'Création le 05/08/2026, facture FA-26-0117 émise le 07/08/2026 : risque d\'avance sur facture, justificatif adhérent à joindre au dossier.' });
+    const nbBloquants = ecarts.filter(e => e.niveau === 'Bloquant').length;
+    ecarts.forEach((e, i) => {
+      const b = e.niveau === 'Bloquant';
+      e.pillStyle = b ? badge('#B3261E', '#FBEAE8', '#ECC3BF') : badge('#7A4306', '#FDF1E2', '#EFD6B4');
+      e.rowStyle = 'display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border-top:1px solid #EDF1F5;background:' + (b ? '#FEF7F6' : '#FFFDF9');
+    });
+
+    const reco = nbKo > 0
+      ? ['Signaler une fraude potentielle', 'Une zone de signature ou de cachet est en anomalie. Geler la traite et transmettre à la conformité avant tout financement.', 'background:#FBEAE8;border:1px solid #ECC3BF;color:#8E3A33']
+      : checkCount < 4
+        ? ['Terminer les vérifications manuelles', 'Les ' + (4 - checkCount) + ' zone(s) restantes doivent être statuées avant toute décision.', 'background:#F6F2FB;border:1px solid #DCCCF0;color:#3F2A5E']
+        : sigTireurOk
+          ? ['Valider la traite', 'Tous les contrôles automatiques et manuels sont levés. Écarts résiduels non bloquants documentés dans le dossier.', 'background:#E8F4ED;border:1px solid #C2E0CE;color:#155F3A']
+          : ['Renvoyer pour complément', 'Signature du tireur absente : demander à ADACTIM une traite régularisée. Sans elle, 8 117,504 DT ne sont pas cédables.', 'background:#FDF1E2;border:1px solid #EFD6B4;color:#7A4306'];
+
+
+    const dec = {
+      valide: ['Traite validée', 'Transmise au financement le 11/08/26 à 10:22. Signature du tireur levée sur l\'original papier, levée tracée dans l\'audit trail.', 'background:#E8F4ED;border:1px solid #C2E0CE;color:#155F3A'],
+      renvoi: ['Renvoyée pour complément', 'Notification envoyée à ADACTIM — traite à régulariser (signature du tireur) et à retourner sous 24h.', 'background:#FDF1E2;border:1px solid #EFD6B4;color:#7A4306'],
+      fraude: ['Fraude potentielle signalée', 'Traite gelée et escaladée à la conformité : cachet du tiré identique à celui du tireur, signature du tireur absente.', 'background:#FBEAE8;border:1px solid #ECC3BF;color:#8E3A33']
+    }[s.decision] || null;
+
+    const statut = s.decision === 'valide' ? 'Validée' : s.decision === 'renvoi' ? 'Renvoyée' : s.decision === 'fraude' ? 'Fraude signalée' : 'Écarts à traiter';
+
+    const zr = this.zone('recto'), zv = this.zone('verso');
+    const canStart = !!s.files.recto && !!s.files.verso;
+
+    const tab = (on) => 'font-size:10.5px;border-radius:4px;padding:3px 8px;cursor:pointer;border:1px solid ' +
+      (on ? '#DCE3EA' : 'transparent') + ';background:' + (on ? '#F5F7FA' : 'transparent') + ';color:' + (on ? '#3C4E5F' : '#6B7E90');
+    const dateRow = (label, val, ok) => ({
+      label, val,
+      icon: ok === true ? '✓' : '!',
+      iconStyle: 'width:16px;height:16px;flex:0 0 16px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;background:' + (ok === true ? '#1E7A4B' : '#B3600A'),
+      rowStyle: 'display:flex;align-items:center;gap:9px;padding:9px 14px;border-bottom:1px solid #EDF1F5;' + (ok === true ? '' : 'background:#FFFDF9')
+    });
+
+    return {
+      isLogin: !s.auth,
+      isApp: s.auth,
+      loginUser: s.loginUser,
+      loginPwd: s.loginPwd,
+      setUser: (e) => this.setState({ loginUser: e.target.value }),
+      setPwd: (e) => this.setState({ loginPwd: e.target.value }),
+      roles: ['Caissier', 'Gestionnaire SA'].map(r => ({
+        label: r, pick: () => this.setState({ loginRole: r }),
+        style: 'flex:1;text-align:center;font-size:11.5px;padding:7px 9px;border-radius:5px;cursor:pointer;border:1px solid ' +
+          (s.loginRole === r ? '#0B2239' : '#DCE3EA') + ';background:' + (s.loginRole === r ? '#0B2239' : '#fff') + ';color:' + (s.loginRole === r ? '#fff' : '#3C4E5F')
+      })),
+      submitLogin: () => {
+        if (!s.loginUser.trim() || !s.loginPwd.trim()) {
+          return this.toast('ko', 'Connexion refusée', 'Identifiant et mot de passe sont obligatoires.');
+        }
+        this.setState({ auth: true, loginPwd: '' });
+        this.toast('ok', 'Bienvenue, ' + s.loginUser.trim(), 'Session ouverte le 11/08/2026 à 09:04 — profil ' + s.loginRole + '. Toutes vos actions sont tracées.');
+      },
+      logout: () => this.setState({ auth: false, loginPwd: '', screen: 'list', decision: null }),
+      userLabel: s.loginUser.trim() || 'H. Mansouri',
+      roleLabel: s.loginRole,
+
+      isRecto: s.face === 'recto',
+      isVerso: s.face === 'verso',
+      showRecto: () => this.setState({ face: 'recto' }),
+      showVerso: () => this.setState({ face: 'verso' }),
+      tabRectoStyle: tab(s.face === 'recto'),
+      versoNoteStyle: s.face === 'verso' ? 'font-size:10.5px;color:#5E3A8C;background:#F3EDFB;border:1px solid #DCCCF0;border-radius:3px;padding:2px 7px' : 'display:none',
+      tabVersoStyle: tab(s.face === 'verso'),
+      faceTitre: s.face === 'recto'
+        ? 'Recto — Lettre de change n° L-CN 011570763437 (1/2)'
+        : 'Verso — zone d\'endossement (2/2)',
+      dateRules: [
+        dateRow('Date de création ≤ date du jour', '05/08/2026 ≤ 11/08/2026', true),
+        dateRow('Date de création ≤ date d\'échéance', '05/08/2026 ≤ 28/08/2026', true),
+        dateRow('Date du jour ≤ date d\'échéance', '11/08/2026 ≤ 28/08/2026', true),
+        dateRow('Date de création ≥ date de la facture', '05/08/2026 < 07/08/2026 — avance sur facture', false)
+      ],
+
+      rectoZoneStyle: zr.style, overRecto: zr.over, leaveRecto: zr.leave, dropRecto: zr.drop, pickRecto: zr.pick,
+      changeRecto: zr.change, rectoInput: this.inputs.recto,
+      rectoEmptyStyle: zr.emptyStyle, rectoNameStyle: zr.nameStyle, rectoName: zr.name,
+      versoZoneStyle: zv.style, overVerso: zv.over, leaveVerso: zv.leave, dropVerso: zv.drop, pickVerso: zv.pick,
+      changeVerso: zv.change, versoInput: this.inputs.verso,
+      versoEmptyStyle: zv.emptyStyle, versoNameStyle: zv.nameStyle, versoName: zv.name,
+      uploadNote: !s.files.recto && !s.files.verso
+        ? 'Les deux faces sont obligatoires : le recto porte les champs extraits par OCR, le verso la zone d\'endossement à l\'ordre de SPG.'
+        : !s.files.recto
+          ? 'Verso importé. Le recto reste obligatoire : sans lui aucun champ ne peut être extrait.'
+          : !s.files.verso
+            ? 'Recto importé. Le verso reste obligatoire pour contrôler l\'endossement.'
+            : 'Recto et verso prêts. L\'agent extrait les 10 zones, rapproche le référentiel IMX et contrôle les mentions obligatoires.',
+      startStyle: 'border:none;border-radius:5px;padding:10px 14px;font-size:12px;font-weight:600;font-family:inherit;cursor:pointer;' +
+        (canStart ? 'background:#0B2239;color:#fff' : 'background:#EDF1F5;color:#93A2B0'),
+      startUpload: () => {
+        if (canStart) return this.startProcessing();
+        const manque = !s.files.recto && !s.files.verso ? 'Le recto et le verso sont manquants.'
+          : !s.files.recto ? 'Le recto est manquant : aucun champ ne peut être extrait sans lui.'
+          : 'Le verso est manquant : la zone d\'endossement à l\'ordre de SPG ne peut pas être contrôlée.';
+        this.toast('ko', 'Analyse impossible', manque + ' Importez les deux faces de la traite.');
+      },
+      resetStyle: (s.files.recto || s.files.verso) ? 'font-size:11px;color:#6B7E90;text-align:center;cursor:pointer;text-decoration:underline' : 'display:none',
+      resetUpload: () => this.setState({ files: { recto: null, verso: null } }),
+      scanLabel: s.files.recto ? s.files.recto.name : 'scan 300 dpi',
+      hasToast: !!s.toast,
+      toastTitre: s.toast ? s.toast.titre : '',
+      toastDetail: s.toast ? s.toast.detail : '',
+      toastIcon: s.toast && s.toast.kind === 'ok' ? '✓' : '⚠',
+      toastStyle: s.toast && s.toast.kind === 'ok'
+        ? 'background:#E8F4ED;border:1px solid #C2E0CE;color:#155F3A'
+        : 'background:#FBEAE8;border:1px solid #ECC3BF;color:#8E3A33',
+      closeToast: () => { clearTimeout(this._toast); this.setState({ toast: null }); },
+
+      isList: s.screen === 'list',
+      isAnalyse: s.screen === 'analyse',
+      goList: () => this.setState({ screen: 'list' }),
+      pageTitle: s.screen === 'list' ? 'Traites à contrôler' : 'Analyse OCR / NLP — L-CN 011570763437',
+
+      filters: filters.map(f => ({
+        label: f, pick: () => this.setState({ filter: f, page: 1 }),
+        style: `font-size:11px;padding:4px 9px;border-radius:4px;cursor:pointer;border:1px solid ${s.filter === f ? '#0B2239' : '#DCE3EA'};background:${s.filter === f ? '#0B2239' : '#fff'};color:${s.filter === f ? '#fff' : '#3C4E5F'}`
+      })),
+
+      traites: list.map(t => ({
+        ref: t[0], tireur: t[1], tire: t[2], montant: t[3] + ' DT', echeance: t[4], reception: t[5],
+        statut: t[6], sla: t[7],
+        badgeStyle: STATUS[t[6]],
+        slaTextStyle: `font-size:11px;font-family:'IBM Plex Mono',monospace;color:${t[9]};font-weight:500`,
+        slaBarStyle: `width:${t[8]}%;height:100%;background:${t[9]}`,
+        rowStyle: `cursor:pointer;background:${t[10] ? '#F7FAFD' : '#fff'}`,
+        open: () => this.startProcessing()
+      })),
+
+      compteurs: [['À traiter', '#6B7E90'], ['En cours OCR', '#1E5C8F'], ['Écarts à traiter', '#B3600A'], ['Contrôle manuel requis', '#7A4FB3'], ['Validée', '#1E7A4B']].map(c => ({
+        label: c[0] === 'Validée' ? 'Validées' : c[0],
+        n: traitesData.filter(t => t[6] === c[0]).length,
+        pick: () => this.setState({ filter: s.filter === c[0] ? 'Toutes' : c[0], page: 1 }),
+        cardStyle: 'background:#fff;border:1px solid ' + (s.filter === c[0] ? '#9FB3C8' : '#D7DEE7') + ';border-top:3px solid ' + c[1] +
+          ';border-radius:5px;padding:12px 14px;cursor:pointer;' + (s.filter === c[0] ? 'box-shadow:0 0 0 2px rgba(30,92,143,.12)' : ''),
+        numStyle: "font-family:'IBM Plex Mono',monospace;font-size:23px;font-weight:600;margin-top:4px;color:" + c[1]
+      })),
+
+      pageInfo: filtered.length === 0 ? 'Aucune traite' :
+        ((page - 1) * perPage + 1) + '–' + Math.min(page * perPage, filtered.length) + ' sur ' + filtered.length + ' traites',
+      pagePrev: goPage(page - 1),
+      pageNext: goPage(page + 1),
+      prevStyle: 'font-size:11px;padding:5px 10px;border-radius:4px;border:1px solid #DCE3EA;background:#fff;' +
+        (page > 1 ? 'color:#3C4E5F;cursor:pointer' : 'color:#B6C2CE;cursor:not-allowed'),
+      nextStyle: 'font-size:11px;padding:5px 10px;border-radius:4px;border:1px solid #DCE3EA;background:#fff;' +
+        (page < nbPages ? 'color:#3C4E5F;cursor:pointer' : 'color:#B6C2CE;cursor:not-allowed'),
+      pages: Array.from({ length: nbPages }, (_, k) => ({
+        num: k + 1, go: goPage(k + 1),
+        style: 'min-width:26px;text-align:center;font-size:11px;font-family:\'IBM Plex Mono\',monospace;padding:5px 8px;border-radius:4px;cursor:pointer;border:1px solid ' +
+          (page === k + 1 ? '#0B2239' : '#DCE3EA') + ';background:' + (page === k + 1 ? '#0B2239' : '#fff') + ';color:' + (page === k + 1 ? '#fff' : '#3C4E5F')
+      })),
+
+      statutTraite: statut,
+      statutBadgeStyle: STATUS[statut] || badge('#B3261E', '#FBEAE8', '#ECC3BF'),
+
+      processing: s.processing,
+      ready: !s.processing,
+      stepLabel: phases[s.phase],
+      pctLabel: ['10 zones à analyser', '4 champs dupliqués extraits', '2 entités rapprochées', '19 contrôles exécutés'][s.phase],
+
+      fields: fieldsData.map(f => ({
+        label: f[0], o1: f[1], o2: f[2],
+        badge: f[3] ? '✓ Cohérent' : '⚠ Occurrence 2 absente',
+        badgeStyle: f[3] ? badge('#155F3A', '#E8F4ED', '#C2E0CE') : badge('#7A4306', '#FDF1E2', '#EFD6B4'),
+        rowStyle: f[3] ? 'background:#fff' : 'background:#FFFDF9'
+      })),
+
+      mentions: [
+        ['Dénomination « lettre de change »', 'Présente au recto (FR / AR)', true],
+        ['Mandat pur et simple de payer', '« payer à l\'ordre de SPG »', true],
+        ['Nom du tiré', 'Adresse portée, raison sociale absente — résolue par le RIB', 'warn'],
+        ['Échéance', '28/08/2026 · 23 jours', true],
+        ['Lieu de paiement', 'UBCI Agence Pasteur · RIB 11 003', true],
+        ['Date et lieu de création', 'Tunis, le 05/08/2026', true],
+        ['Nom du bénéficiaire', 'SPG (factor)', true],
+        ['Signature du tireur', 'Case vide au scan', false]
+      ].map(m => ({
+        label: m[0], val: m[1],
+        icon: m[2] === true ? '✓' : m[2] === 'warn' ? '!' : '✗',
+        iconStyle: 'width:16px;height:16px;flex:0 0 16px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;margin-top:1px;background:' + (m[2] === true ? '#1E7A4B' : m[2] === 'warn' ? '#B3600A' : '#B3261E'),
+        rowStyle: 'display:flex;align-items:flex-start;gap:9px;padding:9px 14px;border-bottom:1px solid #EDF1F5;' + (m[2] === false ? 'background:#FEF7F6' : '')
+      })),
+
+      nlp: [
+        { role: 'Tireur', scan: 'ADACTIM', ref: 'ADACTIM SARL — MF 1330392/A/A/M/000', score: '98 %', barStyle: 'width:98%;height:100%;background:#1E7A4B', badgeStyle: badge('#155F3A', '#E8F4ED', '#C2E0CE') },
+        { role: 'Tiré', scan: 'Lot 31 Z.I Chotrana II, 2036 Ariana', ref: 'LA MÉDITERRANÉENNE (RIB UBCI 11 003)', score: '91 %', barStyle: 'width:91%;height:100%;background:#B3600A', badgeStyle: badge('#7A4306', '#FDF1E2', '#EFD6B4') },
+        { role: 'Ordre', scan: 'SPG', ref: 'ADACTIM — bénéficiaire attendu au contrat IMX', score: '41 %', barStyle: 'width:41%;height:100%;background:#B3600A', badgeStyle: badge('#7A4306', '#FDF1E2', '#EFD6B4') }
+      ],
+
+      checks: checksData.map(c => {
+        const v = s.checks[c[0]];
+        const set = (val) => () => this.setState(st => ({ checks: Object.assign({}, st.checks, { [c[0]]: st.checks[c[0]] === val ? null : val }) }));
+        const btn = (active, fg, bg, bd) => `font-size:10.5px;font-weight:600;padding:4px 9px;border-radius:4px;cursor:pointer;white-space:nowrap;border:1px solid ${active ? bd : '#DCE3EA'};background:${active ? bg : '#fff'};color:${active ? fg : '#6B7E90'}`;
+        return {
+          label: c[1], hint: c[2], face: c[3], zone: c[4], path: c[5] || 'M0 0',
+          emptyStyle: c[5] ? 'display:none' : 'position:absolute;left:0;right:0;bottom:12px;text-align:center;font-size:8px;letter-spacing:.4px;color:#B3261E',
+          setOk: set('ok'), setKo: set('ko'),
+          showFace: () => this.setState({ face: c[3] === 'Verso' ? 'verso' : 'recto' }),
+          okStyle: btn(v === 'ok', '#155F3A', '#E8F4ED', '#C2E0CE'),
+          koStyle: btn(v === 'ko', '#B3261E', '#FBEAE8', '#ECC3BF'),
+          rowStyle: `display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid #EDF1F5;background:${v === 'ok' ? '#F8FBF9' : v === 'ko' ? '#FEF7F6' : '#fff'}`
+        };
+      }),
+      checkCount,
+      manualNote: bloque
+        ? 'Zones restant à statuer : ' + (4 - checkCount) + ' / 4. La décision reste bloquée tant que la signature du tireur n\'est pas levée.'
+        : 'Les 4 zones de contrôle humain sont levées et tracées dans l\'audit trail.',
+
+
+      ecarts,
+      ecartTotalStyle: "font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600;color:" + (nbBloquants > 0 ? '#B3261E' : '#B3600A'),
+      ecartTotal: ecarts.length + ' à arbitrer',
+      ecartDetail: nbBloquants + ' bloquant' + (nbBloquants > 1 ? 's' : '') + ' · ' + (ecarts.length - nbBloquants) + ' avertissement' + (ecarts.length - nbBloquants > 1 ? 's' : ''),
+
+      recoStyle: 'display:flex;flex-direction:column;gap:4px;padding:11px 13px;border-radius:5px;' + reco[2],
+      recoTitre: reco[0],
+      recoDetail: reco[1],
+      bloque,
+      validerStyle: 'width:100%;text-align:left;border-radius:5px;padding:11px 13px;font-family:inherit;display:flex;flex-direction:column;gap:2px;border:none;' + (bloque ? 'background:#EDF1F5;color:#93A2B0;cursor:not-allowed' : 'background:#1E7A4B;color:#fff;cursor:pointer'),
+      validerHint: bloque ? motifBlocage : 'Transmission au financement · irréversible',
+
+      hasDecision: !!dec,
+      decisionLabel: dec ? dec[0] : '',
+      decisionHint: dec ? dec[1] : '',
+      decisionBoxStyle: dec ? `display:flex;flex-direction:column;gap:4px;padding:11px 13px;border-radius:5px;${dec[2]}` : 'display:none',
+      decideValider: bloque ? undefined : () => this.setState({ decision: 'valide' }),
+      decideRenvoyer: () => this.setState({ decision: 'renvoi' }),
+      decideFraude: () => this.setState({ decision: 'fraude' }),
+
+      showMoa: this.props.afficherBandeauMoa ?? true
+    };
+  }
+}
+</script>
+</body>
+</html>
