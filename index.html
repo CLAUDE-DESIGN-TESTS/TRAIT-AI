@@ -110,13 +110,6 @@
       <div style="width:1px; height:30px; background:#E1E7ED"></div>
       <div style="font-size:13px; font-weight:600; color:#2A3B4C">{{ pageTitle }}</div>
       <div style="margin-left:auto; display:flex; align-items:center; gap:14px">
-        <div style="display:flex; flex-direction:column; gap:5px; width:214px">
-          <div style="display:flex; justify-content:space-between; font-size:10.5px; color:#6B7E90">
-            <span style="letter-spacing:.4px; text-transform:uppercase">Délai de traitement</span>
-            <span style="font-family:'IBM Plex Mono',monospace; color:#B3600A; font-weight:600">14h 20m / 24h</span>
-          </div>
-          <div style="height:6px; border-radius:3px; background:#E4E9EF; overflow:hidden"><div style="width:59.7%; height:100%; background:#B3600A"></div></div>
-        </div>
         <div style="display:flex; align-items:center; gap:7px; background:#F3F6F9; border:1px solid #DCE3EA; border-radius:5px; padding:6px 10px">
           <span style="width:7px; height:7px; border-radius:50%; background:#1E7A4B; animation:pulse 1.8s infinite"></span>
           <span style="font-size:11.5px; color:#3C4E5F; font-weight:500">Agent IA actif</span>
@@ -525,17 +518,6 @@
             </div>
           </div>
 
-          <!-- bandeau MOA -->
-          <sc-if value="{{ showMoa }}" hint-placeholder-val="{{ true }}">
-          <div style="background:#F5F7FA; border:1px solid #DCE3EA; border-left:3px solid #8496A8; border-radius:5px; padding:11px 14px; display:flex; gap:11px; align-items:flex-start">
-            <span style="font-size:12px; color:#6B7E90; margin-top:1px">ⓘ</span>
-            <div style="display:flex; flex-direction:column; gap:5px">
-              <span style="font-size:12px; font-weight:600; color:#3C4E5F">Points à clarifier avec la MOA</span>
-              <span style="font-size:11.5px; color:#5F7182; line-height:1.55">Case « Protestable » (Non / Oui) laissée vide sur cette traite : règle de gestion non arbitrée — l'agent ne la contrôle pas et ne bloque pas la remise. Idem pour le champ « Valeur en » non renseigné. Point de vigilance OCR : le nom de l'agence bancaire peut déborder de son cadre — les textes hors zone sont rattachés au champ « Domiciliation ».</span>
-            </div>
-            <span style="margin-left:auto; font-size:11px; color:#6B7E90; white-space:nowrap">2 points ouverts</span>
-          </div>
-          </sc-if>
           </div>
         </div>
 
@@ -752,47 +734,6 @@
               <span style="font-size:11px; color:#6B7E90; flex:1">{{ manualNote }}</span>
             </div>
           </div>
-          <!-- décision caissier -->
-          <div style="background:#fff; border:1px solid #D7DEE7; border-radius:6px; overflow:hidden">
-            <div style="padding:11px 14px; border-bottom:1px solid #E4E9EF; display:flex; align-items:center">
-              <span style="font-size:12.5px; font-weight:600">Décision du caissier</span>
-              <span style="margin-left:auto; font-size:11px; color:#6B7E90">Étape finale · tracée au journal</span>
-            </div>
-            <div style="padding:14px; display:flex; flex-direction:column; gap:10px">
-              <div style="{{ recoStyle }}">
-                <div style="display:flex; align-items:center; gap:7px">
-                  <span style="font-size:11px">◈</span>
-                  <span style="font-size:11px; text-transform:uppercase; letter-spacing:.6px; font-weight:600">Recommandation de l'agent</span>
-                </div>
-                <span style="font-size:12px; font-weight:600">{{ recoTitre }}</span>
-                <span style="font-size:11px; line-height:1.5">{{ recoDetail }}</span>
-              </div>
-              <sc-if value="{{ hasDecision }}" hint-placeholder-val="{{ false }}">
-                <div style="{{ decisionBoxStyle }}">
-                  <span style="font-size:12px; font-weight:600">{{ decisionLabel }}</span>
-                  <span style="font-size:11px; line-height:1.5">{{ decisionHint }}</span>
-                </div>
-              </sc-if>
-              <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:9px">
-                <button onClick="{{ decideValider }}" disabled="{{ bloque }}" style="{{ validerStyle }}" style-hover="filter:brightness(.94)">
-                  <span style="font-size:12.5px; font-weight:600">✓ Valider la traite</span>
-                  <span style="font-size:10.5px; opacity:.85; line-height:1.35">{{ validerHint }}</span>
-                </button>
-                <button onClick="{{ decideRenvoyer }}" style="text-align:left; background:#fff; color:#7A4306; border:1px solid #E2C79E; border-radius:5px; padding:11px 13px; font-family:inherit; cursor:pointer; display:flex; flex-direction:column; gap:2px" style-hover="background:#FDF1E2">
-                  <span style="font-size:12.5px; font-weight:600">↩ Renvoyer</span>
-                  <span style="font-size:10.5px; color:#8A5312; line-height:1.35">Complément demandé à ADACTIM</span>
-                </button>
-                <button onClick="{{ decideFraude }}" style="text-align:left; background:#fff; color:#B3261E; border:1px solid #ECC3BF; border-radius:5px; padding:11px 13px; font-family:inherit; cursor:pointer; display:flex; flex-direction:column; gap:2px" style-hover="background:#FBEAE8">
-                  <span style="font-size:12.5px; font-weight:600">⚑ Signaler fraude</span>
-                  <span style="font-size:10.5px; color:#8E3A33; line-height:1.35">Escalade conformité · gel</span>
-                </button>
-              </div>
-              <div style="display:flex; flex-direction:column; gap:6px">
-                <span style="font-size:10.5px; text-transform:uppercase; letter-spacing:.7px; color:#6B7E90">Commentaire (obligatoire si écart)</span>
-                <div style="border:1px solid #DCE3EA; border-radius:4px; padding:8px 10px; min-height:54px; font-size:11.5px; color:#9AA9B7; background:#FCFDFE">Signature du tireur contrôlée sur l'original papier du 11/08/2026…</div>
-              </div>
-            </div>
-          </div>
           </sc-if>
         </div>
       </div>
@@ -929,7 +870,8 @@ class Component extends DCLogic {
       ['Montant en lettres', 'Huit mille cent dix-sept dinars, 504 millimes', '8 117,504 DT', true],
       ['Échéance', '28/08/2026', '28/08/2026', true],
       ['RIB tiré', '11 003 0002917001788 36', '11 003 0002917001788 36', true],
-      ['Lieu / date de création', 'Tunis — 05/08/2026', 'Tunis — 05/08/2026', true]
+      ['Lieu de création', 'Tunis', 'Tunis', true],
+      ['Date de création', '05/08/2026', '05/08/2026', true]
     ];
 
     const checksData = [
